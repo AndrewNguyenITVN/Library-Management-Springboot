@@ -1,4 +1,4 @@
-package com.librabry.LibrabryManagement;
+package com.library.LibraryManagement;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
