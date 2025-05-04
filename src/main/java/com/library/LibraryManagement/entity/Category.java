@@ -15,4 +15,28 @@ public class Category {
 
     @OneToMany(mappedBy = "categoryId")
     private Set<Book> bookSet;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getNameCate() {
+        return nameCate;
+    }
+
+    public void setNameCate(String nameCate) {
+        this.nameCate = nameCate;
+    }
+
+    public Set<Book> getBookSet() {
+        return bookSet;
+    }
+
+    public void setBookSet(Set<Book> bookSet) {
+        this.bookSet = bookSet;
+    }
 }

@@ -30,4 +30,61 @@ public class Borrowing {
 
     @Column(name = "status")
     private Boolean status; // true: đã trả, false: đang mượn
+
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public Reader getReaderId() {
+        return readerId;
+    }
+
+    public void setReaderId(Reader readerId) {
+        this.readerId = readerId;
+    }
+
+    public Book getBookId() {
+        return bookId;
+    }
+
+    public void setBookId(Book bookId) {
+        this.bookId = bookId;
+    }
+
+    public Date getBorrowedAt() {
+        return borrowedAt;
+    }
+
+    public void setBorrowedAt(Date borrowedAt) {
+        this.borrowedAt = borrowedAt;
+    }
+
+    public Date getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(Date dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    public Date getReturnedAt() {
+        return returnedAt;
+    }
+
+    public void setReturnedAt(Date returnedAt) {
+        this.returnedAt = returnedAt;
+    }
+
+    public Boolean getStatus() {
+        return status;
+    }
+
+    public void setStatus(Boolean status) {
+        this.status = status;
+    }
 }
