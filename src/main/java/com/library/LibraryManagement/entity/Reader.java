@@ -3,6 +3,7 @@ package com.library.LibraryManagement.entity;
 import jakarta.persistence.*;
 
 import java.util.Date;
+import java.util.Set;
 
 @Entity(name = "reader")
 public class Reader {
@@ -18,4 +19,8 @@ public class Reader {
 
     @Column(name = "created_at")
     private Date createdAt;
+
+    @OneToMany(mappedBy = "readerId")
+    private Set<Borrowing> borrowingSet;
+
 }
