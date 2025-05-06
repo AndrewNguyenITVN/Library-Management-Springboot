@@ -22,7 +22,6 @@ public class LoginService implements LoginServiceImp {
 
         for (User user: listUser){
             UserDTO userDTO = new UserDTO();
-            userDTO.setId(user.getId());
             userDTO.setUsername(user.getUsername());
             userDTO.setPassword(user.getPassword());
             userDTOList.add(userDTO);

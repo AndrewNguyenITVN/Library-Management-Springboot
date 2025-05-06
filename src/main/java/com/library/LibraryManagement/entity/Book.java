@@ -19,7 +19,7 @@ public class Book {
     private Category categoryId;
 
     @Column(name = "stock_quantity")
-    private Integer stockQuantity;
+    private int stockQuantity;
 
     @Column(name = "image_url")
     private String imageUrl;
