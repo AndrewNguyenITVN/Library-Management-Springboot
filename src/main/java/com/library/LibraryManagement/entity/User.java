@@ -21,8 +21,8 @@ public class User {
     private Role role;
 
     public enum Role {
-        ADMIN,
-        STAFF
+        admin,
+        staff
     }
 
     public int getId() {
