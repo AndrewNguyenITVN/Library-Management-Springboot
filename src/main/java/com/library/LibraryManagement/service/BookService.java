@@ -52,11 +52,21 @@ public class BookService implements BookServiceImp {
                 isInsertSuccess = true;
             }
         }catch(Exception e){
-            System.out.println("Loi crate restaurant " + e.getMessage());
+            System.out.println("Loi crate book " + e.getMessage());
         }
         return isInsertSuccess;
 
     }
 
-
+    @Override
+    public boolean delBook(int id) {
+        boolean isDelSuccess = false;
+        try {
+            bookRepository.deleteById(id);
+            isDelSuccess = true;
+        }catch (Exception e){
+            System.out.println("Loi delete book " + e.getMessage());
+        }
+        return  isDelSuccess;
+    }
 }

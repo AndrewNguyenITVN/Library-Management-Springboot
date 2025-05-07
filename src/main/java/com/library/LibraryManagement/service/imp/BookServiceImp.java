@@ -10,6 +10,6 @@ import java.util.List;
 public interface BookServiceImp {
     List<BookDTO> getAllBook();
     boolean addBook(MultipartFile file, String nameBook, int categoryId, int stockQuantity);
-//    void delBook(int id);
+    boolean delBook(int id);
 //    void editBook(int id);
 }

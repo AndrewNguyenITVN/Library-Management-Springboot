@@ -38,4 +38,13 @@ public final class BookController {
         responseData.setData(isSuccess);
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
+
+    @PostMapping("/delete-book")
+    public ResponseEntity<?> deleteBookFromList(@RequestParam int id)
+    {
+        ResponseData responseData = new ResponseData();
+        boolean isSuccess = bookServiceImp.delBook(id);
+        responseData.setData(isSuccess);
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
+    }
 }
