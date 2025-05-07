@@ -27,6 +27,11 @@ public class Book {
     @Column(name = "created_at")
     private Date createdAt;
 
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = new Date();
+    }
+
     @OneToMany(mappedBy = "bookId")
     private Set<Borrowing> borrowingSet;
 

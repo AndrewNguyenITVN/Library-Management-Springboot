@@ -2,13 +2,14 @@ package com.library.LibraryManagement.service.imp;
 
 import com.library.LibraryManagement.dto.BookDTO;
 import com.library.LibraryManagement.entity.Category;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 import java.util.List;
 
 public interface BookServiceImp {
     List<BookDTO> getAllBook();
-//    void addBook( String nameBook, Category categoryId, int stockQuantity, String imageUrl);
+    boolean addBook(MultipartFile file, String nameBook, int categoryId, int stockQuantity);
 //    void delBook(int id);
 //    void editBook(int id);
 }

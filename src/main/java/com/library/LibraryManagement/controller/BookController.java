@@ -1,17 +1,21 @@
 package com.library.LibraryManagement.controller;
 
+import com.library.LibraryManagement.entity.Category;
 import com.library.LibraryManagement.payload.ResponseData;
 import com.library.LibraryManagement.service.imp.BookServiceImp;
+import com.library.LibraryManagement.service.imp.FileServiceImp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/book")
 public final class BookController {
+    @Autowired
+    FileServiceImp fileServiceImp;
+
     @Autowired
     BookServiceImp bookServiceImp;
 
@@ -23,5 +27,15 @@ public final class BookController {
         responseData.setData(bookServiceImp.getAllBook());
         return new ResponseEntity<>(responseData, HttpStatus.OK);
 
+    }
+
+    @PostMapping("/add-book")
+    public ResponseEntity<?> addBooks(@RequestParam MultipartFile file, String nameBook, int categoryId, int stockQuantity)
+    {
+
+        ResponseData responseData = new ResponseData();
+        boolean isSuccess = bookServiceImp.addBook(file, nameBook, categoryId, stockQuantity);
+        responseData.setData(isSuccess);
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 }

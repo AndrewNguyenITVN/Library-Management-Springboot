@@ -5,8 +5,10 @@ import com.library.LibraryManagement.entity.Book;
 import com.library.LibraryManagement.entity.Category;
 import com.library.LibraryManagement.repository.BookRepository;
 import com.library.LibraryManagement.service.imp.BookServiceImp;
+import com.library.LibraryManagement.service.imp.FileServiceImp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +17,9 @@ import java.util.List;
 public class BookService implements BookServiceImp {
     @Autowired
     BookRepository bookRepository;
+
+    @Autowired
+    FileServiceImp fileServiceImp;
 
     @Override
     public List<BookDTO> getAllBook() {
@@ -28,6 +33,29 @@ public class BookService implements BookServiceImp {
             bookDTOList.add(bookDTO);
         }
         return bookDTOList;
+    }
+
+    @Override
+    public boolean addBook(MultipartFile file, String nameBook, int categoryId, int stockQuantity) {
+        boolean isInsertSuccess = false;
+        try{
+            boolean isSave = fileServiceImp.saveFile(file);
+            if(isSave){
+                Book book = new Book();
+                book.setImageUrl(file.getOriginalFilename());
+                book.setNameBook(nameBook);
+                book.setStockQuantity(stockQuantity);
+                Category category = new Category();
+                category.setId(categoryId);
+                book.setCategoryId(category);
+                bookRepository.save(book);
+                isInsertSuccess = true;
+            }
+        }catch(Exception e){
+            System.out.println("Loi crate restaurant " + e.getMessage());
+        }
+        return isInsertSuccess;
+
     }
 
 
