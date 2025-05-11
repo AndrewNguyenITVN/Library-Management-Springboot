@@ -8,5 +8,6 @@ public interface ReaderServiceImp {
     boolean insertReader(String fullName, String idCard, String phone);
     List<ReaderDTO> getAllReaders();
     List<ReaderDTO> searchReaderByName(String name);
+    List<ReaderDTO> searchReaderByIdentityCard(String identityCard);
 
 }

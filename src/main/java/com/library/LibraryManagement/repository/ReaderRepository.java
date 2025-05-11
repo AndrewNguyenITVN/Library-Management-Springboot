@@ -9,4 +9,6 @@ public interface ReaderRepository extends JpaRepository<Reader, Integer> {
     boolean existsByEmail(String email);
     List<Reader> getAllReaders();
     List<Reader> findByNameReader(String nameReader);
+    List<Reader> findByIdentityCard(String identityCard);
+
 }

@@ -69,4 +69,20 @@ public class ReaderService implements ReaderServiceImp {
 
         return result;
     }
+
+    @Override
+    public List<ReaderDTO> searchReaderByIdentityCard(String identityCard) {
+        List<Reader> readers = readerRepository.findByIdentityCard(identityCard);
+        List<ReaderDTO> result = new ArrayList<>();
+
+        for (Reader reader : readers) {
+            ReaderDTO dto = new ReaderDTO();
+            dto.setNameReader(reader.getNameReader());
+            dto.setIdentityCard(reader.getIdentityCard());
+            dto.setPhone(reader.getPhone());
+            result.add(dto);
+        }
+
+        return result;
+    }
 }

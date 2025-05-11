@@ -20,7 +20,7 @@ public class ReaderController {
     @PostMapping("/insert-reader")
     public ResponseEntity<?> insertReader(@RequestParam String nameReader,
                                                         @RequestParam String identityCard,
-                                                        @RequestParam String phone {
+                                                        @RequestParam String phone) {
         ResponseData responseData = new ResponseData();
         boolean success = readerServiceImp.insertReader(nameReader, identityCard, phone);
         responseData.setSuccess(true);
@@ -42,6 +42,16 @@ public class ReaderController {
     public ResponseEntity<?> searchReader(@RequestParam String nameReader) {
         ResponseData responseData = new ResponseData();
         responseData.setData(readerServiceImp.searchReaderByName(nameReader));
+        responseData.setSuccess(true);
+        responseData.setDesc("Lấy danh nguoi doc thành công");
+
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
+    }
+
+    @GetMapping("/search-by-idcard")
+    public ResponseEntity<?> searchByIdentityCard(@RequestParam String identityCard) {
+        ResponseData responseData = new ResponseData();
+        responseData.setData(readerServiceImp.searchReaderByName(identityCard));
         responseData.setSuccess(true);
         responseData.setDesc("Lấy danh nguoi doc thành công");
 
