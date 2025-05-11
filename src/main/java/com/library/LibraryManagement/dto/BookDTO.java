@@ -1,5 +1,6 @@
 package com.library.LibraryManagement.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.library.LibraryManagement.entity.Category;
 import jakarta.persistence.Column;
 import jakarta.persistence.JoinColumn;
@@ -9,16 +10,26 @@ import java.util.Date;
 
 public class BookDTO {
 
+    private int id;
+
     private String nameBook;
 
     private int stockQuantity;
 
     private String imageUrl;
-
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy")
     private Date createdAt;
 
     public String getNameBook() {
         return nameBook;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public void setNameBook(String nameBook) {

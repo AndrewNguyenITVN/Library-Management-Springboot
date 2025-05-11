@@ -27,10 +27,12 @@ public class BookService implements BookServiceImp {
         List<BookDTO> bookDTOList = new ArrayList<>();
         for(Book book: bookList){
             BookDTO bookDTO = new BookDTO();
+            bookDTO.setId(book.getId());
             bookDTO.setNameBook(book.getNameBook());
             bookDTO.setStockQuantity(book.getStockQuantity());
             bookDTO.setImageUrl(book.getImageUrl());
             bookDTOList.add(bookDTO);
+            bookDTO.setCreatedAt(book.getCreatedAt());
         }
         return bookDTOList;
     }
@@ -59,6 +61,36 @@ public class BookService implements BookServiceImp {
     }
 
     @Override
+    public boolean editBook(int id, MultipartFile file, String nameBook, int stockQuantity, int categoryId) {
+        boolean isEditSuccess = false;
+        try {
+            Book book = bookRepository.findById(id).orElse(null);
+            if (book != null) {
+                // Nếu có file mới, lưu file và cập nhật URL hình ảnh
+                if (file != null && !file.isEmpty()) {
+                    boolean isSaved = fileServiceImp.saveFile(file);
+                    if (isSaved) {
+                        book.setImageUrl(file.getOriginalFilename());
+                    }
+                }
+                // Cập nhật thông tin khác
+                book.setNameBook(nameBook);
+                book.setStockQuantity(stockQuantity);
+                Category category = new Category();
+                category.setId(categoryId);
+                book.setCategoryId(category);
+
+                // Lưu lại
+                bookRepository.save(book);
+                isEditSuccess = true;
+            }
+        } catch (Exception e) {
+            System.out.println("Lỗi khi cập nhật sách: " + e.getMessage());
+        }
+        return isEditSuccess;
+    }
+
+    @Override
     public boolean delBook(int id) {
         boolean isDelSuccess = false;
         try {
@@ -69,4 +101,6 @@ public class BookService implements BookServiceImp {
         }
         return  isDelSuccess;
     }
+
+
 }

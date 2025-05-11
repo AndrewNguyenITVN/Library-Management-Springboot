@@ -5,12 +5,10 @@ import com.library.LibraryManagement.service.imp.LoginServiceImp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/login")
 public class LoginController {
 
@@ -18,7 +16,7 @@ public class LoginController {
     LoginServiceImp loginServiceImp;
 
     @PostMapping("/signin")
-    public ResponseEntity<?> signin(@RequestParam String username, String password) {
+    public ResponseEntity<?> signin(@RequestParam String username, @RequestParam String password) {
         ResponseData responseData = new ResponseData();
 
         if(loginServiceImp.checkLogin(username, password)){

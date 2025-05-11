@@ -11,5 +11,5 @@ public interface BookServiceImp {
     List<BookDTO> getAllBook();
     boolean addBook(MultipartFile file, String nameBook, int categoryId, int stockQuantity);
     boolean delBook(int id);
-//    void editBook(int id);
+    boolean editBook(int id, MultipartFile file, String nameBook, int stockQuantity, int categoryId);
 }

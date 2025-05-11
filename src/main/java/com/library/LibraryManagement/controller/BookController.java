@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/book")
 public final class BookController {
     @Autowired
@@ -46,5 +47,19 @@ public final class BookController {
         boolean isSuccess = bookServiceImp.delBook(id);
         responseData.setData(isSuccess);
         return new ResponseEntity<>(responseData, HttpStatus.OK);
+    }
+
+    @PutMapping("/books/{id}")
+    public ResponseEntity<?> updateBook(@PathVariable int id,
+                                        @RequestParam("file") MultipartFile file,
+                                        @RequestParam("nameBook") String nameBook,
+                                        @RequestParam("stockQuantity") int stockQuantity,
+                                        @RequestParam("categoryId") int categoryId) {
+        boolean isSuccess = bookServiceImp.editBook(id, file, nameBook, stockQuantity, categoryId);
+        if (isSuccess) {
+            return ResponseEntity.ok("Cập nhật sách thành công.");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cập nhật thất bại.");
+        }
     }
 }
