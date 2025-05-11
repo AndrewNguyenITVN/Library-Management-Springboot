@@ -23,7 +23,7 @@ public final class BookController {
     @Autowired
     BookServiceImp bookServiceImp;
 
-    @GetMapping("/show-listof-all-books")
+    @GetMapping("/show-all-books")
     public ResponseEntity<?> showListOfBooks() {
         ResponseData responseData = new ResponseData();
         responseData.setSuccess(true);

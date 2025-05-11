@@ -17,6 +17,17 @@ public class Reader {
     @Column(name = "identity_card")
     private String identityCard;
 
+    @Column(name = "phone")
+    private String phone;
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
     @Column(name = "created_at")
     private Date createdAt;
 
