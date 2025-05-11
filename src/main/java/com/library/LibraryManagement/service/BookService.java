@@ -102,5 +102,21 @@ public class BookService implements BookServiceImp {
         return  isDelSuccess;
     }
 
+    @Override
+    public List<BookDTO> searchBook(String keyword) {
+        List<Book> bookList = bookRepository.findByNameBook(keyword);
+        List<BookDTO> bookDTOList = new ArrayList<>();
 
+        for (Book book : bookList) {
+            BookDTO bookDTO = new BookDTO();
+            bookDTO.setId(book.getId());
+            bookDTO.setNameBook(book.getNameBook());
+            bookDTO.setStockQuantity(book.getStockQuantity());
+            bookDTO.setImageUrl(book.getImageUrl());
+            bookDTO.setCreatedAt(book.getCreatedAt());
+            bookDTOList.add(bookDTO);
+        }
+
+        return bookDTOList;
+    }
 }

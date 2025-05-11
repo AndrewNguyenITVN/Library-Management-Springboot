@@ -1,5 +1,6 @@
 package com.library.LibraryManagement.controller;
 
+import com.library.LibraryManagement.dto.BookDTO;
 import com.library.LibraryManagement.entity.Category;
 import com.library.LibraryManagement.payload.ResponseData;
 import com.library.LibraryManagement.service.imp.BookServiceImp;
@@ -9,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @CrossOrigin
@@ -61,5 +64,18 @@ public final class BookController {
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cập nhật thất bại.");
         }
+    }
+
+    @GetMapping("/books/search")
+    public ResponseEntity<?> searchBooks(@RequestParam String keyword) {
+        ResponseData responseData = new ResponseData();
+        try {
+            List<BookDTO> result = bookServiceImp.searchBook(keyword);
+            responseData.setData(result);
+            responseData.setSuccess(true);
+        }catch (Exception e) {
+            responseData.setSuccess(false);
+        }
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 }

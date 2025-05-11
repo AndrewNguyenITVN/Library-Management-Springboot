@@ -3,6 +3,8 @@ package com.library.LibraryManagement.repository;
 import com.library.LibraryManagement.entity.Book;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface BookRepository extends JpaRepository<Book, Integer> {
+import java.util.List;
 
+public interface BookRepository extends JpaRepository<Book, Integer> {
+    List<Book> findByNameBook(String keyword);
 }
