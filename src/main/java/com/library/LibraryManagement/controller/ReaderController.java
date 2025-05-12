@@ -53,7 +53,7 @@ public class ReaderController {
         ResponseData responseData = new ResponseData();
         responseData.setData(readerServiceImp.searchReaderByName(identityCard));
         responseData.setSuccess(true);
-        responseData.setDesc("Lấy danh nguoi doc thành công");
+        responseData.setDesc("Tìm danh nguoi doc thành công");
 
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
