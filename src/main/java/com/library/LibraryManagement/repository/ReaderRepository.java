@@ -6,8 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface ReaderRepository extends JpaRepository<Reader, Integer> {
-    boolean existsByEmail(String email);
-    List<Reader> getAllReaders();
+    boolean existsByIdentityCard(String identityCard);
+    //List<Reader> getAllReaders();
     List<Reader> findByNameReader(String nameReader);
     List<Reader> findByIdentityCard(String identityCard);
 

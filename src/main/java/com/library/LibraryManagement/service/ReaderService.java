@@ -20,7 +20,7 @@ public class ReaderService implements ReaderServiceImp {
         boolean isInsertSuccess = false;
         try {
             // Kiểm tra email đã tồn tại
-            if (readerRepository.existsByEmail(idCard)) {
+            if (readerRepository.existsByIdentityCard(idCard)) {
                 System.out.println("ID card already exists");
                 return false;
             }
