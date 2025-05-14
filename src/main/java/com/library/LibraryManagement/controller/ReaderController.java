@@ -51,7 +51,7 @@ public class ReaderController {
     @GetMapping("/search-by-idcard")
     public ResponseEntity<?> searchByIdentityCard(@RequestParam String identityCard) {
         ResponseData responseData = new ResponseData();
-        responseData.setData(readerServiceImp.searchReaderByName(identityCard));
+        responseData.setData(readerServiceImp.searchReaderByIdentityCard(identityCard));
         responseData.setSuccess(true);
         responseData.setDesc("Tìm danh sách nguoi doc thành công");
 
