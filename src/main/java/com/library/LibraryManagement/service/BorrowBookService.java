@@ -10,8 +10,10 @@ import com.library.LibraryManagement.repository.ReaderRepository;
 import com.library.LibraryManagement.service.imp.BorrowBookServiceImp;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class BorrowBookService implements BorrowBookServiceImp {
     @Autowired
@@ -63,11 +65,38 @@ public class BorrowBookService implements BorrowBookServiceImp {
 
     @Override
     public List<BorrowingDTO> getAllBorrowings() {
-        return List.of();
+        List<Borrowing> borrowingList= borrowingRepository.findAll();
+        List<BorrowingDTO> borrowingDTOList = new ArrayList<>();
+        for (Borrowing borrowing : borrowingList) {
+            BorrowingDTO borrowingDTO = new BorrowingDTO();
+            borrowingDTO.setBookId(borrowing.getBookId().getId());
+            borrowingDTO.setReaderId(borrowing.getReaderId().getId());
+            borrowingDTO.setBorrowedAt(borrowing.getBorrowedAt());
+            borrowingDTO.setDueDate(borrowing.getDueDate());
+            borrowingDTO.setStatus(borrowing.getStatus());
+
+            borrowingDTOList.add(borrowingDTO);
+        }
+        return borrowingDTOList;
     }
 
     @Override
     public List<BorrowingDTO> getBorrowingsByReaderId(int readerId) {
-        return List.of();
+        return borrowingRepository.findByReaderId(readerId)
+                .stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
     }
+
+    private BorrowingDTO toDTO(Borrowing b) {
+        BorrowingDTO dto = new BorrowingDTO();
+        dto.setReaderId(b.getReaderId().getId());
+        dto.setBookId(b.getBookId().getId());
+        dto.setBookTitle(b.getBookId().getNameBook());
+        dto.setBorrowedAt(b.getBorrowedAt());
+        dto.setReturnedAt(b.getReturnedAt());
+        dto.setStatus(b.getStatus());
+        return dto;
+    }
+
 }

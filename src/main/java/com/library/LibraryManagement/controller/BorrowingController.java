@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @CrossOrigin
 @RequestMapping("/borrowing")
@@ -44,6 +46,26 @@ public class BorrowingController {
             resp.setSuccess(false);
             resp.setDesc("Trả sách thất bại: " + e.getMessage());
         }
+        return new ResponseEntity<>(resp, HttpStatus.OK);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<?> getAll() {
+        ResponseData resp = new ResponseData();
+        List<BorrowingDTO> list = borrowBookServiceImp.getAllBorrowings();
+        resp.setSuccess(true);
+        resp.setData(list);
+        resp.setDesc("Danh sách mượn trả");
+        return new ResponseEntity<>(resp, HttpStatus.OK);
+    }
+
+    @GetMapping("/by-reader")
+    public ResponseEntity<?> getByReader(@RequestParam int readerId) {
+        ResponseData resp = new ResponseData();
+        List<BorrowingDTO> list = borrowBookServiceImp.getBorrowingsByReaderId(readerId);
+        resp.setSuccess(true);
+        resp.setData(list);
+        resp.setDesc("Danh sách mượn trả của độc giả");
         return new ResponseEntity<>(resp, HttpStatus.OK);
     }
 }
