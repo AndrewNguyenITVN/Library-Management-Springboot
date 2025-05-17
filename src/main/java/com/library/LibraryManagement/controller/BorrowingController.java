@@ -31,4 +31,19 @@ public class BorrowingController {
         }
         return new ResponseEntity<>(resp, HttpStatus.OK);
     }
+
+    @PutMapping("/return")
+    public ResponseEntity<?> returnBook(@RequestParam int borrowingId) {
+        ResponseData resp = new ResponseData();
+        try {
+            Boolean isSuccess = borrowBookServiceImp.returnBook(borrowingId);
+            resp.setSuccess(true);
+            resp.setData(isSuccess);
+            resp.setDesc("Trả sách thành công");
+        } catch (Exception e) {
+            resp.setSuccess(false);
+            resp.setDesc("Trả sách thất bại: " + e.getMessage());
+        }
+        return new ResponseEntity<>(resp, HttpStatus.OK);
+    }
 }

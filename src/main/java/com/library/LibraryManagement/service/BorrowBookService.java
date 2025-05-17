@@ -48,7 +48,17 @@ public class BorrowBookService implements BorrowBookServiceImp {
 
     @Override
     public Boolean returnBook(int borrowingId) {
-        return null;
+        Borrowing borrowing = borrowingRepository.findById(borrowingId)
+                .orElseThrow(() -> new RuntimeException("Mượn trả không tồn tại"));
+        borrowing.setReturnedAt(new Date());
+        borrowing.setStatus(false);
+        try{
+            borrowingRepository.save(borrowing);
+            return true;
+        }catch(Exception e){
+            System.out.println(e);
+            return false;
+        }
     }
 
     @Override
