@@ -31,7 +31,7 @@ public class Reader {
     @Column(name = "created_at")
     private Date createdAt;
 
-    @OneToMany(mappedBy = "readerId")
+    @OneToMany(mappedBy = "identityCard")
     private Set<Borrowing> borrowingSet;
 
     public int getId() {

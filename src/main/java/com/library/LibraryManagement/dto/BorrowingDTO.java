@@ -4,28 +4,28 @@ import java.util.Date;
 
 public class BorrowingDTO {
 
-    private int readerId;
-    private int bookId;
+    private String identityCard;
+    private String bookSeri;
     private String bookTitle;
     private Date borrowedAt;
     private Date returnedAt;
     private Boolean status;
     private Date dueDate;
 
-    public int getReaderId() {
-        return readerId;
+    public String getIdentityCard() {
+        return identityCard;
     }
 
-    public void setReaderId(int readerId) {
-        this.readerId = readerId;
+    public void setIdentityCard(String identityCard) {
+        this.identityCard = identityCard;
     }
 
-    public int getBookId() {
-        return bookId;
+    public String getBookSeri() {
+        return bookSeri;
     }
 
-    public void setBookId(int bookId) {
-        this.bookId = bookId;
+    public void setBookSeri(String bookSeri) {
+        this.bookSeri = bookSeri;
     }
 
     public String getBookTitle() {

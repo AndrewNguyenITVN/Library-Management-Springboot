@@ -9,12 +9,14 @@ import com.library.LibraryManagement.repository.BorrowingRepository;
 import com.library.LibraryManagement.repository.ReaderRepository;
 import com.library.LibraryManagement.service.imp.BorrowBookServiceImp;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 public class BorrowBookService implements BorrowBookServiceImp {
     @Autowired
     private BorrowingRepository borrowingRepository;
@@ -63,30 +65,30 @@ public class BorrowBookService implements BorrowBookServiceImp {
         }
     }
 
-    @Override
-    public List<BorrowingDTO> getAllBorrowings() {
-        List<Borrowing> borrowingList= borrowingRepository.findAll();
-        List<BorrowingDTO> borrowingDTOList = new ArrayList<>();
-        for (Borrowing borrowing : borrowingList) {
-            BorrowingDTO borrowingDTO = new BorrowingDTO();
-            borrowingDTO.setBookId(borrowing.getBookId().getId());
-            borrowingDTO.setReaderId(borrowing.getReaderId().getId());
-            borrowingDTO.setBorrowedAt(borrowing.getBorrowedAt());
-            borrowingDTO.setDueDate(borrowing.getDueDate());
-            borrowingDTO.setStatus(borrowing.getStatus());
+//    @Override
+//    public List<BorrowingDTO> getAllBorrowings() {
+//        List<Borrowing> borrowingList= borrowingRepository.findAll();
+//        List<BorrowingDTO> borrowingDTOList = new ArrayList<>();
+//        for (Borrowing borrowing : borrowingList) {
+//            BorrowingDTO borrowingDTO = new BorrowingDTO();
+//            borrowingDTO.setBookId(borrowing.getBookId().getId());
+//            borrowingDTO.setReaderId(borrowing.getReaderId().getId());
+//            borrowingDTO.setBorrowedAt(borrowing.getBorrowedAt());
+//            borrowingDTO.setDueDate(borrowing.getDueDate());
+//            borrowingDTO.setStatus(borrowing.getStatus());
+//
+//            borrowingDTOList.add(borrowingDTO);
+//        }
+//        return borrowingDTOList;
+//    }
 
-            borrowingDTOList.add(borrowingDTO);
-        }
-        return borrowingDTOList;
-    }
-
-    @Override
-    public List<BorrowingDTO> getBorrowingsByReaderId(int readerId) {
-        return borrowingRepository.findByReaderId(readerId)
-                .stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
-    }
+//    @Override
+//    public List<BorrowingDTO> getBorrowingsByReaderId(int readerId) {
+//        return borrowingRepository.findByReaderId(readerId)
+//                .stream()
+//                .map(this::toDTO)
+//                .collect(Collectors.toList());
+//    }
 
     private BorrowingDTO toDTO(Borrowing b) {
         BorrowingDTO dto = new BorrowingDTO();

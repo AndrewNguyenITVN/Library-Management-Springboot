@@ -12,12 +12,12 @@ public class Borrowing {
     private int id;
 
     @ManyToOne
-    @JoinColumn(name = "reader_id")
-    private Reader readerId;
+    @JoinColumn(name = "identity_card")
+    private Reader identityCard;
 
     @ManyToOne
-    @JoinColumn(name = "book_id")
-    private Book bookId;
+    @JoinColumn(name = "book_seri")
+    private Book bookSeri;
 
     @Column(name = "borrowed_at")
     private Date borrowedAt;
@@ -40,20 +40,20 @@ public class Borrowing {
         this.id = id;
     }
 
-    public Reader getReaderId() {
-        return readerId;
+    public Reader getIdentityCard() {
+        return identityCard;
     }
 
-    public void setReaderId(Reader readerId) {
-        this.readerId = readerId;
+    public void setIdentityCard(Reader identityCard) {
+        this.identityCard = identityCard;
     }
 
-    public Book getBookId() {
-        return bookId;
+    public Book getBookSeri() {
+        return bookSeri;
     }
 
-    public void setBookId(Book bookId) {
-        this.bookId = bookId;
+    public void setBookSeri(Book bookSeri) {
+        this.bookSeri = bookSeri;
     }
 
     public Date getBorrowedAt() {

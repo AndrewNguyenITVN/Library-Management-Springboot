@@ -12,6 +12,8 @@ public class BookDTO {
 
     private int id;
 
+    private String bookSeri;
+
     private String nameBook;
 
     private int stockQuantity;
@@ -19,6 +21,14 @@ public class BookDTO {
     private String imageUrl;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy")
     private Date createdAt;
+
+    public String getBookSeri() {
+        return bookSeri;
+    }
+
+    public void setBookSeri(String bookSeri) {
+        this.bookSeri = bookSeri;
+    }
 
     public String getNameBook() {
         return nameBook;

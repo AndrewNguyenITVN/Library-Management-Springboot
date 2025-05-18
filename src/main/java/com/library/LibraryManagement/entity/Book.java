@@ -11,6 +11,9 @@ public class Book {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @Column(name = "book_seri")
+    private String bookSeri;
+
     @Column(name = "name_book")
     private String nameBook;
 
@@ -32,7 +35,19 @@ public class Book {
         this.createdAt = new Date();
     }
 
-    @OneToMany(mappedBy = "bookId")
+    public String getBookSeri() {
+        return bookSeri;
+    }
+
+    public void setBookSeri(String bookSeri) {
+        this.bookSeri = bookSeri;
+    }
+
+    public void setStockQuantity(int stockQuantity) {
+        this.stockQuantity = stockQuantity;
+    }
+
+    @OneToMany(mappedBy = "bookSeri")
     private Set<Borrowing> borrowingSet;
 
     public int getId() {
