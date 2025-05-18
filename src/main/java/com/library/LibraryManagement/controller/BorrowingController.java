@@ -19,11 +19,11 @@ public class BorrowingController {
     private BorrowBookServiceImp borrowBookServiceImp;
 
     @PostMapping("/borrow")
-    public ResponseEntity<?> borrowBook(@RequestParam int readerId,
-                                        @RequestParam int bookId) {
+    public ResponseEntity<?> borrowBook(@RequestParam String identityCard,
+                                        @RequestParam String bookSeri) {
         ResponseData resp = new ResponseData();
         try {
-            Boolean isSuccess = borrowBookServiceImp.borrowBook(readerId, bookId);
+            Boolean isSuccess = borrowBookServiceImp.borrowBook(identityCard, bookSeri);
             resp.setSuccess(true);
             resp.setData(isSuccess);
             resp.setDesc("Mượn sách thành công");

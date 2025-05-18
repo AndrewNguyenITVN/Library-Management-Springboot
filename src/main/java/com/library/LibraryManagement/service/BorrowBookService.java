@@ -28,23 +28,40 @@ public class BorrowBookService implements BorrowBookServiceImp {
     private BookRepository bookRepository;
 
     @Override
-    public Boolean borrowBook(int readerId, int bookId) {
-        Reader reader = readerRepository.findById(readerId)
-                .orElseThrow(() -> new RuntimeException("Reader không tồn tại"));
-        Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new RuntimeException("Book không tồn tại"));
+    public Boolean borrowBook(String identityCard, String bookSeri) {
+        // 1. Lấy Reader và Book, ném exception nếu không tồn tại
+        Reader reader = readerRepository.findByIdentityCard(identityCard);
+        reader.setIdentityCard(identityCard);
+        Book book = bookRepository.findByBookSeri(bookSeri);
+        book.setNameBook(bookSeri);
 
         Borrowing borrowing = new Borrowing();
-        borrowing.setReaderId(reader);
-        borrowing.setBookId(book);
-        borrowing.setBorrowedAt(new Date());
-        borrowing.setDueDate(new Date());
-        borrowing.setStatus(true);
-        try{
+
+        borrowing.setIdentityCard(reader);
+
+        borrowing.setBookSeri(book);
+
+        Date now = new Date();
+        borrowing.setBorrowedAt(now);
+
+        long sevenDaysMs = 7L * 24 * 60 * 60 * 1000;
+        Date due = new Date(now.getTime() + sevenDaysMs);
+        borrowing.setDueDate(due);
+
+        borrowing.setReturnedAt(null);
+        borrowing.setStatus(false);
+
+        if (book.getStockQuantity() <= 0) {
+            throw new RuntimeException("Sách đã hết hàng");
+        }
+        book.setStockQuantity(book.getStockQuantity() - 1);
+        bookRepository.save(book);
+
+        try {
             borrowingRepository.save(borrowing);
             return true;
-        }catch (Exception e){
-            System.out.println(e);
+        } catch (Exception e) {
+            System.err.println("Lỗi khi ghi borrowing: " + e.getMessage());
             return false;
         }
 
@@ -92,9 +109,9 @@ public class BorrowBookService implements BorrowBookServiceImp {
 
     private BorrowingDTO toDTO(Borrowing b) {
         BorrowingDTO dto = new BorrowingDTO();
-        dto.setReaderId(b.getReaderId().getId());
-        dto.setBookId(b.getBookId().getId());
-        dto.setBookTitle(b.getBookId().getNameBook());
+        dto.setIdentityCard(b.getIdentityCard().getIdentityCard());
+        dto.setBookSeri(b.getBookSeri().getBookSeri());
+        dto.setBookTitle(b.getBookSeri().getNameBook());
         dto.setBorrowedAt(b.getBorrowedAt());
         dto.setReturnedAt(b.getReturnedAt());
         dto.setStatus(b.getStatus());
