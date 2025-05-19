@@ -13,4 +13,5 @@ public interface BookServiceImp {
     boolean delBook(int id);
     boolean editBook(int id, MultipartFile file, String bookSeri, String nameBook, int stockQuantity, int categoryId);
     List<BookDTO> searchBook(String keyword);
+    BookDTO searchBookByBookSeri(String bookSeri);
 }

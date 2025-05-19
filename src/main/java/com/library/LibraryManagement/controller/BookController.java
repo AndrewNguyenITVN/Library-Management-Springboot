@@ -79,4 +79,17 @@ public final class BookController {
         }
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
+
+    @GetMapping("/search-seri")
+    public ResponseEntity<?> searchBookByBookSeri(@RequestParam String bookSeri) {
+        ResponseData responseData = new ResponseData();
+        try {
+            BookDTO result = bookServiceImp.searchBookByBookSeri(bookSeri);
+            responseData.setData(result);
+            responseData.setSuccess(true);
+        }catch (Exception e) {
+            responseData.setSuccess(false);
+        }
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
+    }
 }

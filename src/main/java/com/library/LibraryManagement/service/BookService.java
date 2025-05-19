@@ -121,4 +121,20 @@ public class BookService implements BookServiceImp {
 
         return bookDTOList;
     }
+
+    @Override
+    public BookDTO searchBookByBookSeri(String bookSeri) {
+        Book book = bookRepository.findByBookSeri(bookSeri);
+        BookDTO bookDTO = new BookDTO();
+
+        bookDTO.setId(book.getId());
+        bookDTO.setBookSeri(book.getBookSeri());
+        bookDTO.setNameBook(book.getNameBook());
+        bookDTO.setStockQuantity(book.getStockQuantity());
+        bookDTO.setImageUrl(book.getImageUrl());
+        bookDTO.setCreatedAt(book.getCreatedAt());
+
+
+        return bookDTO;
+    }
 }
