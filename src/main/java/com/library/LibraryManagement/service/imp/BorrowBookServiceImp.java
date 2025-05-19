@@ -8,5 +8,5 @@ public interface BorrowBookServiceImp {
     Boolean borrowBook(String identityCard, String bookSeri );
     Boolean returnBook(int borrowingId);
     List<BorrowingDTO> getAllBorrowings();
-//    List<BorrowingDTO> getBorrowingsByReaderId(int readerId);
+    List<BorrowingDTO> getBorrowingsByIdentityCard(String identityCard);
 }

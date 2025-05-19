@@ -106,13 +106,30 @@ public class BorrowBookService implements BorrowBookServiceImp {
         return borrowingDTOList;
     }
 
-//    @Override
-//    public List<BorrowingDTO> getBorrowingsByReaderId(int readerId) {
-//        return borrowingRepository.findByReaderId(readerId)
-//                .stream()
-//                .map(this::toDTO)
-//                .collect(Collectors.toList());
-//    }
+    @Override
+    public List<BorrowingDTO> getBorrowingsByIdentityCard(String identityCard) {
+        List<Borrowing> borrowingList = borrowingRepository.findByIdentityCardIdentityCard(identityCard);
+        List<BorrowingDTO> borrowingDTOList = new ArrayList<>();
+        for (Borrowing borrowing : borrowingList) {
+            if(borrowing.getStatus() == false){
+                BorrowingDTO borrowingDTO = new BorrowingDTO();
+                borrowingDTO.setIdBorrow(borrowing.getId());
+                borrowingDTO.setBookSeri(borrowing.getBookSeri().getBookSeri());
+                borrowingDTO.setIdentityCard(borrowing.getIdentityCard().getIdentityCard());
+                borrowingDTO.setBookName(borrowing.getBookSeri().getNameBook());
+                borrowingDTO.setReaderName(borrowing.getIdentityCard().getNameReader());
+                borrowingDTO.setBorrowedAt(borrowing.getBorrowedAt());
+                borrowingDTO.setReturnedAt(borrowing.getReturnedAt());
+                borrowingDTO.setDueDate(borrowing.getDueDate());
+                borrowingDTO.setStatus(borrowing.getStatus());
+                borrowingDTOList.add(borrowingDTO);
+            }
+
+
+        }
+        return borrowingDTOList;
+
+    }
 
     private BorrowingDTO toDTO(Borrowing b) {
         BorrowingDTO dto = new BorrowingDTO();

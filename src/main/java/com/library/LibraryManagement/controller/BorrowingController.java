@@ -59,13 +59,13 @@ public class BorrowingController {
         return new ResponseEntity<>(resp, HttpStatus.OK);
     }
 
-//    @GetMapping("/by-reader")
-//    public ResponseEntity<?> getByReader(@RequestParam int readerId) {
-//        ResponseData resp = new ResponseData();
-//        List<BorrowingDTO> list = borrowBookServiceImp.getBorrowingsByReaderId(readerId);
-//        resp.setSuccess(true);
-//        resp.setData(list);
-//        resp.setDesc("Danh sách mượn trả của độc giả");
-//        return new ResponseEntity<>(resp, HttpStatus.OK);
-//    }
+    @GetMapping("/by-reader")
+    public ResponseEntity<?> getBorrowingsByIdentityCard(@RequestParam String identityCard) {
+        ResponseData resp = new ResponseData();
+        List<BorrowingDTO> list = borrowBookServiceImp.getBorrowingsByIdentityCard(identityCard);
+        resp.setSuccess(true);
+        resp.setData(list);
+        resp.setDesc("Danh sách mượn trả của độc giả");
+        return new ResponseEntity<>(resp, HttpStatus.OK);
+    }
 }
