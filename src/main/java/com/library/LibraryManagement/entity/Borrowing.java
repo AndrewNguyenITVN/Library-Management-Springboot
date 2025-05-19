@@ -12,11 +12,11 @@ public class Borrowing {
     private int id;
 
     @ManyToOne
-    @JoinColumn(name = "identity_card")
+    @JoinColumn(name = "identity_card", referencedColumnName = "identity_card")
     private Reader identityCard;
 
     @ManyToOne
-    @JoinColumn(name = "book_seri")
+    @JoinColumn(name = "book_seri", referencedColumnName = "book_seri")
     private Book bookSeri;
 
     @Column(name = "borrowed_at")

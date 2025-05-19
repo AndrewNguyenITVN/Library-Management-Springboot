@@ -82,22 +82,24 @@ public class BorrowBookService implements BorrowBookServiceImp {
         }
     }
 
-//    @Override
-//    public List<BorrowingDTO> getAllBorrowings() {
-//        List<Borrowing> borrowingList= borrowingRepository.findAll();
-//        List<BorrowingDTO> borrowingDTOList = new ArrayList<>();
-//        for (Borrowing borrowing : borrowingList) {
-//            BorrowingDTO borrowingDTO = new BorrowingDTO();
-//            borrowingDTO.setBookId(borrowing.getBookId().getId());
-//            borrowingDTO.setReaderId(borrowing.getReaderId().getId());
-//            borrowingDTO.setBorrowedAt(borrowing.getBorrowedAt());
-//            borrowingDTO.setDueDate(borrowing.getDueDate());
-//            borrowingDTO.setStatus(borrowing.getStatus());
-//
-//            borrowingDTOList.add(borrowingDTO);
-//        }
-//        return borrowingDTOList;
-//    }
+    @Override
+    public List<BorrowingDTO> getAllBorrowings() {
+        List<Borrowing> borrowingList= borrowingRepository.findAll();
+        List<BorrowingDTO> borrowingDTOList = new ArrayList<>();
+        for (Borrowing borrowing : borrowingList) {
+            BorrowingDTO borrowingDTO = new BorrowingDTO();
+            borrowingDTO.setBookSeri(borrowing.getBookSeri().getBookSeri());
+            borrowingDTO.setIdentityCard(borrowing.getIdentityCard().getIdentityCard());
+            borrowingDTO.setBookName(borrowing.getBookSeri().getNameBook());
+            borrowingDTO.setReaderName(borrowing.getIdentityCard().getNameReader());
+            borrowingDTO.setBorrowedAt(borrowing.getBorrowedAt());
+            borrowingDTO.setDueDate(borrowing.getDueDate());
+            borrowingDTO.setStatus(borrowing.getStatus());
+
+            borrowingDTOList.add(borrowingDTO);
+        }
+        return borrowingDTOList;
+    }
 
 //    @Override
 //    public List<BorrowingDTO> getBorrowingsByReaderId(int readerId) {
@@ -111,7 +113,7 @@ public class BorrowBookService implements BorrowBookServiceImp {
         BorrowingDTO dto = new BorrowingDTO();
         dto.setIdentityCard(b.getIdentityCard().getIdentityCard());
         dto.setBookSeri(b.getBookSeri().getBookSeri());
-        dto.setBookTitle(b.getBookSeri().getNameBook());
+        dto.setBookName(b.getBookSeri().getNameBook());
         dto.setBorrowedAt(b.getBorrowedAt());
         dto.setReturnedAt(b.getReturnedAt());
         dto.setStatus(b.getStatus());

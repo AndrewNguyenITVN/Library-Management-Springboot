@@ -60,11 +60,14 @@ public final class BookController {
                                         @RequestParam("stockQuantity") int stockQuantity,
                                         @RequestParam("categoryId") int categoryId) {
         boolean isSuccess = bookServiceImp.editBook(id, file, bookSeri, nameBook, stockQuantity, categoryId);
+        ResponseData responseData = new ResponseData();
         if (isSuccess) {
-            return ResponseEntity.ok("Cập nhật sách thành công.");
+            responseData.setData(isSuccess);
+            responseData.setSuccess(true);
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cập nhật thất bại.");
+            responseData.setSuccess(false);
         }
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
     @GetMapping("/search")

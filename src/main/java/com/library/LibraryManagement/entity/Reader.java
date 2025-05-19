@@ -13,8 +13,7 @@ public class Reader {
 
     @Column(name = "name_reader")
     private String nameReader;
-
-    @Column(name = "identity_card")
+    @Column(name = "identity_card", unique = true, nullable = false)
     private String identityCard;
 
     @Column(name = "phone")

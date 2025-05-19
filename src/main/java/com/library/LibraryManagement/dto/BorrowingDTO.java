@@ -6,7 +6,8 @@ public class BorrowingDTO {
 
     private String identityCard;
     private String bookSeri;
-    private String bookTitle;
+    private String bookName;
+    private String readerName;
     private Date borrowedAt;
     private Date returnedAt;
     private Boolean status;
@@ -28,12 +29,20 @@ public class BorrowingDTO {
         this.bookSeri = bookSeri;
     }
 
-    public String getBookTitle() {
-        return bookTitle;
+    public String getBookName() {
+        return bookName;
     }
 
-    public void setBookTitle(String bookTitle) {
-        this.bookTitle = bookTitle;
+    public void setBookName(String bookName) {
+        this.bookName = bookName;
+    }
+
+    public String getReaderName() {
+        return readerName;
+    }
+
+    public void setReaderName(String readerName) {
+        this.readerName = readerName;
     }
 
     public Date getBorrowedAt() {
