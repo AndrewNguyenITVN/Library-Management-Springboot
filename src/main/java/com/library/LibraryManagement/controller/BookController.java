@@ -34,11 +34,11 @@ public final class BookController {
     }
 
     @PostMapping("/add-book")
-    public ResponseEntity<?> addBooks(@RequestParam MultipartFile file, String nameBook, int categoryId, int stockQuantity)
+    public ResponseEntity<?> addBooks(@RequestParam MultipartFile file, String bookSeri,  String nameBook, int categoryId, int stockQuantity)
     {
 
         ResponseData responseData = new ResponseData();
-        boolean isSuccess = bookServiceImp.addBook(file, nameBook, categoryId, stockQuantity);
+        boolean isSuccess = bookServiceImp.addBook(file, bookSeri, nameBook, categoryId, stockQuantity);
         responseData.setData(isSuccess);
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
@@ -52,13 +52,14 @@ public final class BookController {
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
-    @PutMapping("/books/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<?> updateBook(@PathVariable int id,
                                         @RequestParam("file") MultipartFile file,
+                                        @RequestParam("bookSeri") String bookSeri,
                                         @RequestParam("nameBook") String nameBook,
                                         @RequestParam("stockQuantity") int stockQuantity,
                                         @RequestParam("categoryId") int categoryId) {
-        boolean isSuccess = bookServiceImp.editBook(id, file, nameBook, stockQuantity, categoryId);
+        boolean isSuccess = bookServiceImp.editBook(id, file, bookSeri, nameBook, stockQuantity, categoryId);
         if (isSuccess) {
             return ResponseEntity.ok("Cập nhật sách thành công.");
         } else {
@@ -66,11 +67,11 @@ public final class BookController {
         }
     }
 
-    @GetMapping("/books/search")
-    public ResponseEntity<?> searchBooks(@RequestParam String keyword) {
+    @GetMapping("/search")
+    public ResponseEntity<?> searchBooks(@RequestParam String bookName) {
         ResponseData responseData = new ResponseData();
         try {
-            List<BookDTO> result = bookServiceImp.searchBook(keyword);
+            List<BookDTO> result = bookServiceImp.searchBook(bookName);
             responseData.setData(result);
             responseData.setSuccess(true);
         }catch (Exception e) {

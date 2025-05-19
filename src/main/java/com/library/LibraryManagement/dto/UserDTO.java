@@ -1,10 +1,5 @@
 package com.library.LibraryManagement.dto;
 
-import com.library.LibraryManagement.entity.User;
-import jakarta.persistence.Column;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-
 public class UserDTO {
 
     private String username;

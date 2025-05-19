@@ -38,13 +38,14 @@ public class BookService implements BookServiceImp {
     }
 
     @Override
-    public boolean addBook(MultipartFile file, String nameBook, int categoryId, int stockQuantity) {
+    public boolean addBook(MultipartFile file, String bookSeri, String nameBook, int categoryId, int stockQuantity) {
         boolean isInsertSuccess = false;
         try{
             boolean isSave = fileServiceImp.saveFile(file);
             if(isSave){
                 Book book = new Book();
                 book.setImageUrl(file.getOriginalFilename());
+                book.setBookSeri(bookSeri);
                 book.setNameBook(nameBook);
                 book.setStockQuantity(stockQuantity);
                 Category category = new Category();
@@ -61,7 +62,7 @@ public class BookService implements BookServiceImp {
     }
 
     @Override
-    public boolean editBook(int id, MultipartFile file, String nameBook, int stockQuantity, int categoryId) {
+    public boolean editBook(int id, MultipartFile file, String bookSeri, String nameBook, int stockQuantity, int categoryId) {
         boolean isEditSuccess = false;
         try {
             Book book = bookRepository.findById(id).orElse(null);
@@ -76,6 +77,7 @@ public class BookService implements BookServiceImp {
                 // Cập nhật thông tin khác
                 book.setNameBook(nameBook);
                 book.setStockQuantity(stockQuantity);
+                book.setBookSeri(bookSeri);
                 Category category = new Category();
                 category.setId(categoryId);
                 book.setCategoryId(category);
@@ -103,8 +105,8 @@ public class BookService implements BookServiceImp {
     }
 
     @Override
-    public List<BookDTO> searchBook(String keyword) {
-        List<Book> bookList = bookRepository.findByNameBook(keyword);
+    public List<BookDTO> searchBook(String bookName) {
+        List<Book> bookList = bookRepository.findByNameBookContainingIgnoreCase(bookName);
         List<BookDTO> bookDTOList = new ArrayList<>();
 
         for (Book book : bookList) {
