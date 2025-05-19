@@ -3,7 +3,7 @@ package com.library.LibraryManagement.dto;
 import java.util.Date;
 
 public class BorrowingDTO {
-
+    private int idBorrow;
     private String identityCard;
     private String bookSeri;
     private String bookName;
@@ -12,6 +12,14 @@ public class BorrowingDTO {
     private Date returnedAt;
     private Boolean status;
     private Date dueDate;
+
+    public int getIdBorrow() {
+        return idBorrow;
+    }
+
+    public void setIdBorrow(int idBorrow) {
+        this.idBorrow = idBorrow;
+    }
 
     public String getIdentityCard() {
         return identityCard;

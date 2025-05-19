@@ -1,6 +1,7 @@
 package com.library.LibraryManagement.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.util.Date;
 import java.util.Set;
@@ -27,7 +28,7 @@ public class Reader {
         this.phone = phone;
     }
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", insertable=false)
     private Date createdAt;
 
     @OneToMany(mappedBy = "identityCard")

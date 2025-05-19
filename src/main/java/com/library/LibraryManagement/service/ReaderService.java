@@ -56,7 +56,7 @@ public class ReaderService implements ReaderServiceImp {
 
     @Override
     public List<ReaderDTO> searchReaderByName(String name) {
-        List<Reader> readers = readerRepository.findByNameReader(name);
+        List<Reader> readers = readerRepository.findByNameReaderContainingIgnoreCase(name);
         List<ReaderDTO> result = new ArrayList<>();
 
         for (Reader reader : readers) {

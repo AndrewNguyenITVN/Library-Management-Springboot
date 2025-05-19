@@ -72,7 +72,7 @@ public class BorrowBookService implements BorrowBookServiceImp {
         Borrowing borrowing = borrowingRepository.findById(borrowingId)
                 .orElseThrow(() -> new RuntimeException("Mượn trả không tồn tại"));
         borrowing.setReturnedAt(new Date());
-        borrowing.setStatus(false);
+        borrowing.setStatus(true);
         try{
             borrowingRepository.save(borrowing);
             return true;
@@ -87,16 +87,21 @@ public class BorrowBookService implements BorrowBookServiceImp {
         List<Borrowing> borrowingList= borrowingRepository.findAll();
         List<BorrowingDTO> borrowingDTOList = new ArrayList<>();
         for (Borrowing borrowing : borrowingList) {
-            BorrowingDTO borrowingDTO = new BorrowingDTO();
-            borrowingDTO.setBookSeri(borrowing.getBookSeri().getBookSeri());
-            borrowingDTO.setIdentityCard(borrowing.getIdentityCard().getIdentityCard());
-            borrowingDTO.setBookName(borrowing.getBookSeri().getNameBook());
-            borrowingDTO.setReaderName(borrowing.getIdentityCard().getNameReader());
-            borrowingDTO.setBorrowedAt(borrowing.getBorrowedAt());
-            borrowingDTO.setDueDate(borrowing.getDueDate());
-            borrowingDTO.setStatus(borrowing.getStatus());
+            if(borrowing.getStatus() == false){
+                BorrowingDTO borrowingDTO = new BorrowingDTO();
+                borrowingDTO.setIdBorrow(borrowing.getId());
+                borrowingDTO.setBookSeri(borrowing.getBookSeri().getBookSeri());
+                borrowingDTO.setIdentityCard(borrowing.getIdentityCard().getIdentityCard());
+                borrowingDTO.setBookName(borrowing.getBookSeri().getNameBook());
+                borrowingDTO.setReaderName(borrowing.getIdentityCard().getNameReader());
+                borrowingDTO.setBorrowedAt(borrowing.getBorrowedAt());
+                borrowingDTO.setReturnedAt(borrowing.getReturnedAt());
+                borrowingDTO.setDueDate(borrowing.getDueDate());
+                borrowingDTO.setStatus(borrowing.getStatus());
+                borrowingDTOList.add(borrowingDTO);
+            }
 
-            borrowingDTOList.add(borrowingDTO);
+
         }
         return borrowingDTOList;
     }

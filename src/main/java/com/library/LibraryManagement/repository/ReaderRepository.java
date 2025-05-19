@@ -8,7 +8,7 @@ import java.util.List;
 public interface ReaderRepository extends JpaRepository<Reader, Integer> {
     boolean existsByIdentityCard(String identityCard);
     //List<Reader> getAllReaders();
-    List<Reader> findByNameReader(String nameReader);
+    List<Reader> findByNameReaderContainingIgnoreCase(String nameReader);
     Reader findByIdentityCard(String identityCard);
 
 }
