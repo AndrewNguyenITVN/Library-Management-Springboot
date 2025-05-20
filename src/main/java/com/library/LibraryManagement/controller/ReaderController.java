@@ -37,7 +37,7 @@ public class ReaderController {
         responseData.setData(readerServiceImp.getAllReaders());
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
-    //Chua ok
+
     @GetMapping("/search")
     public ResponseEntity<?> searchReader(@RequestParam String nameReader) {
         ResponseData responseData = new ResponseData();

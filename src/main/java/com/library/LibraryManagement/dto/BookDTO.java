@@ -15,6 +15,8 @@ public class BookDTO {
 
     private int stockQuantity;
 
+    private int categoryId;
+
     private String imageUrl;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy")
     private Date createdAt;
@@ -65,5 +67,13 @@ public class BookDTO {
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public int getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(int categoryId) {
+        this.categoryId = categoryId;
     }
 }

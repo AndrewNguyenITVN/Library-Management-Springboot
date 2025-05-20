@@ -28,7 +28,9 @@ public class BookService implements BookServiceImp {
         for(Book book: bookList){
             BookDTO bookDTO = new BookDTO();
             bookDTO.setId(book.getId());
+            bookDTO.setBookSeri(book.getBookSeri());
             bookDTO.setNameBook(book.getNameBook());
+            bookDTO.setCategoryId(book.getCategoryId().getId());
             bookDTO.setStockQuantity(book.getStockQuantity());
             bookDTO.setImageUrl(book.getImageUrl());
             bookDTOList.add(bookDTO);
