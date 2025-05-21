@@ -33,4 +33,21 @@ public class LoginController {
     }
 
 
+    @PostMapping("/add-user")
+    public ResponseEntity<?> createUSer(
+            @RequestParam String username,
+            @RequestParam String password,
+            @RequestParam String email,
+            @RequestParam String role){
+        ResponseData responseData = new ResponseData();
+
+        if(loginServiceImp.createUser(username,password, email, role)){
+            responseData.setData("");
+            responseData.setSuccess(true);
+        }else {
+            responseData.setData("");
+            responseData.setSuccess(false);
+        }
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
+    }
 }

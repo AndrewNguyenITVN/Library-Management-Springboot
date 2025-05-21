@@ -35,6 +35,25 @@ public class LoginService implements LoginServiceImp {
         User user = userRepository.findByusername(username);
         return  password.equals(user.getPassword());
     }
+
+    @Override
+    public Boolean createUser(String usename, String password, String email, String role) {
+        User user = new User();
+        user.setUsername(usename);
+        user.setPassword(password);
+        user.setEmail(email);
+        User.Role roleEnum = User.Role.valueOf(role);
+        user.setRole(roleEnum);
+        try {
+            userRepository.save(user);
+            return true;
+        }catch (Exception e){
+            System.out.println(e);
+            return false;
+        }
+
+
+    }
 }
 
 
