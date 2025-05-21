@@ -31,9 +31,7 @@ public class BorrowBookService implements BorrowBookServiceImp {
     public Boolean borrowBook(String identityCard, String bookSeri) {
         // 1. Lấy Reader và Book, ném exception nếu không tồn tại
         Reader reader = readerRepository.findByIdentityCard(identityCard);
-        reader.setIdentityCard(identityCard);
         Book book = bookRepository.findByBookSeri(bookSeri);
-        book.setNameBook(bookSeri);
 
         Borrowing borrowing = new Borrowing();
 

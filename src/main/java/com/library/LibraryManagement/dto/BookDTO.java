@@ -17,6 +17,8 @@ public class BookDTO {
 
     private int categoryId;
 
+    private String categoryName;
+
     private String imageUrl;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy")
     private Date createdAt;
@@ -75,5 +77,13 @@ public class BookDTO {
 
     public void setCategoryId(int categoryId) {
         this.categoryId = categoryId;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
     }
 }
