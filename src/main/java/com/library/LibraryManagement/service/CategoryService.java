@@ -1,11 +1,15 @@
 package com.library.LibraryManagement.service;
 
+import com.library.LibraryManagement.dto.CategoryDTO;
+import com.library.LibraryManagement.dto.UserDTO;
 import com.library.LibraryManagement.entity.Category;
+import com.library.LibraryManagement.entity.User;
 import com.library.LibraryManagement.repository.CategoryRepository;
 import com.library.LibraryManagement.service.imp.CategoryServiceImp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,7 +40,14 @@ public class CategoryService implements CategoryServiceImp {
     }
 
     @Override
-    public List<Category> getAllCategories() {
-        return categoryRepository.findAll();
+    public List<CategoryDTO> getAllCategories() {
+        List<Category> categoryList = categoryRepository.findAll();
+        List<CategoryDTO> categoryDTOList = new ArrayList<>();
+        for (Category category: categoryList){
+            CategoryDTO categoryDTO = new CategoryDTO();
+            categoryDTO.setNameCate(category.getNameCate());
+            categoryDTOList.add(categoryDTO);
+        }
+        return categoryDTOList;
     }
 }
