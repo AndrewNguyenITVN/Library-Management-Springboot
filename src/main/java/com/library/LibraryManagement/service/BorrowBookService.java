@@ -131,13 +131,24 @@ public class BorrowBookService implements BorrowBookServiceImp {
 
     private BorrowingDTO toDTO(Borrowing b) {
         BorrowingDTO dto = new BorrowingDTO();
+        dto.setReaderName(b.getIdentityCard().getNameReader());
         dto.setIdentityCard(b.getIdentityCard().getIdentityCard());
         dto.setBookSeri(b.getBookSeri().getBookSeri());
         dto.setBookName(b.getBookSeri().getNameBook());
         dto.setBorrowedAt(b.getBorrowedAt());
         dto.setReturnedAt(b.getReturnedAt());
+        dto.setDueDate(b.getDueDate());
         dto.setStatus(b.getStatus());
         return dto;
     }
 
+
+    @Override
+    public List<BorrowingDTO> getOverdueBorrowings() {
+        Date today = new Date();
+        List<Borrowing> overdue = borrowingRepository.findByDueDateBeforeAndStatusFalse(today);
+        return overdue.stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
 }

@@ -68,4 +68,14 @@ public class BorrowingController {
         resp.setDesc("Danh sách mượn trả của độc giả");
         return new ResponseEntity<>(resp, HttpStatus.OK);
     }
+
+    @GetMapping("/overdue")
+    public ResponseEntity<?> getOverdueBorrowings() {
+        ResponseData resp = new ResponseData();
+        List<BorrowingDTO> list = borrowBookServiceImp.getOverdueBorrowings();
+        resp.setSuccess(true);
+        resp.setData(list);
+        resp.setDesc("Danh sách mượn quá hạn");
+        return new ResponseEntity<>(resp, HttpStatus.OK);
+    }
 }
