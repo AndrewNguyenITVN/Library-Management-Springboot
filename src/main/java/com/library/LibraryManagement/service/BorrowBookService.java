@@ -133,6 +133,7 @@ public class BorrowBookService implements BorrowBookServiceImp {
         BorrowingDTO dto = new BorrowingDTO();
         dto.setReaderName(b.getIdentityCard().getNameReader());
         dto.setIdentityCard(b.getIdentityCard().getIdentityCard());
+        dto.setPhone(b.getIdentityCard().getPhone());
         dto.setBookSeri(b.getBookSeri().getBookSeri());
         dto.setBookName(b.getBookSeri().getNameBook());
         dto.setBorrowedAt(b.getBorrowedAt());

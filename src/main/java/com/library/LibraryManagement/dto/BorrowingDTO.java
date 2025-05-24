@@ -5,6 +5,7 @@ import java.util.Date;
 public class BorrowingDTO {
     private int idBorrow;
     private String identityCard;
+    private String phone;
     private String bookSeri;
     private String bookName;
     private String readerName;
@@ -83,5 +84,13 @@ public class BorrowingDTO {
 
     public void setDueDate(Date dueDate) {
         this.dueDate = dueDate;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 }
