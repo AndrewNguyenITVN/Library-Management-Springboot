@@ -1,6 +1,7 @@
 package com.library.LibraryManagement.service;
 
 import com.library.LibraryManagement.dto.BorrowingDTO;
+import com.library.LibraryManagement.dto.BorrowingStatsDTO;
 import com.library.LibraryManagement.entity.Book;
 import com.library.LibraryManagement.entity.Borrowing;
 import com.library.LibraryManagement.entity.Reader;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -151,5 +153,94 @@ public class BorrowBookService implements BorrowBookServiceImp {
         return overdue.stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
+    }
+
+
+    @Override
+    public long countBorrowingsInWeek(int year, int week) {
+        Date weekStart = getWeekStart(year, week);
+        Date weekEnd   = getWeekEnd(weekStart);
+        return borrowingRepository.countByBorrowedAtBetween(weekStart, weekEnd);
+    }
+
+    @Override
+    public long countBorrowingsInMonth(int year, int month) {
+        Date monthStart = getMonthStart(year, month);
+        Date monthEnd   = getMonthEnd(monthStart);
+        return borrowingRepository.countByBorrowedAtBetween(monthStart, monthEnd);
+    }
+
+    @Override
+    public List<BorrowingDTO> getBorrowingsInWeek(int year, int week) {
+        Date weekStart = getWeekStart(year, week);
+        Date weekEnd   = getWeekEnd(weekStart);
+        return borrowingRepository.findByBorrowedAtBetween(weekStart, weekEnd)
+                .stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<BorrowingDTO> getBorrowingsInMonth(int year, int month) {
+        Date monthStart = getMonthStart(year, month);
+        Date monthEnd   = getMonthEnd(monthStart);
+        return borrowingRepository.findByBorrowedAtBetween(monthStart, monthEnd)
+                .stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    // helper tính tuần
+    private Date getWeekStart(int year, int week) {
+        Calendar cal = Calendar.getInstance();
+        cal.setFirstDayOfWeek(Calendar.MONDAY);
+        cal.clear();
+        cal.set(Calendar.YEAR, year);
+        cal.set(Calendar.WEEK_OF_YEAR, week);
+        cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        setStartOfDay(cal);
+        return cal.getTime();
+    }
+
+    private Date getWeekEnd(Date weekStart) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(weekStart);
+        cal.add(Calendar.DAY_OF_WEEK, 6);
+        setEndOfDay(cal);
+        return cal.getTime();
+    }
+
+    // helper tính tháng
+    private Date getMonthStart(int year, int month) {
+        Calendar cal = Calendar.getInstance();
+        cal.clear();
+        cal.set(Calendar.YEAR, year);
+        cal.set(Calendar.MONTH, month - 1);
+        cal.set(Calendar.DAY_OF_MONTH, 1);
+        setStartOfDay(cal);
+        return cal.getTime();
+    }
+
+    private Date getMonthEnd(Date monthStart) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(monthStart);
+        int lastDay = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+        cal.set(Calendar.DAY_OF_MONTH, lastDay);
+        setEndOfDay(cal);
+        return cal.getTime();
+    }
+
+    private void setStartOfDay(Calendar cal) {
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+    }
+
+    private void setEndOfDay(Calendar cal) {
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        cal.set(Calendar.MILLISECOND, 999);
     }
 }

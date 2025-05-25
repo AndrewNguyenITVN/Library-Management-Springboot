@@ -8,8 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @CrossOrigin
@@ -76,6 +79,51 @@ public class BorrowingController {
         resp.setSuccess(true);
         resp.setData(list);
         resp.setDesc("Danh sách mượn quá hạn");
+        return new ResponseEntity<>(resp, HttpStatus.OK);
+    }
+    @GetMapping("/stats")
+    public ResponseEntity<ResponseData> getBorrowingStats(
+            @RequestParam String type,
+            @RequestParam int year,
+            @RequestParam(required = false) Integer week,
+            @RequestParam(required = false) Integer month) {
+
+        if ("week".equalsIgnoreCase(type) && week == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Missing 'week' when type=week");
+        }
+        if ("month".equalsIgnoreCase(type) && month == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Missing 'month' when type=month");
+        }
+
+        long count;
+        List<BorrowingDTO> list;
+        if ("week".equalsIgnoreCase(type)) {
+            count = borrowBookServiceImp.countBorrowingsInWeek(year, week);
+            list  = borrowBookServiceImp.getBorrowingsInWeek(year, week);
+        }
+        else if ("month".equalsIgnoreCase(type)) {
+            count = borrowBookServiceImp.countBorrowingsInMonth(year, month);
+            list  = borrowBookServiceImp.getBorrowingsInMonth(year, month);
+        }
+        else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Invalid type, must be 'week' or 'month'");
+        }
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("type", type.toLowerCase());
+        data.put("year", year);
+        if ("week".equalsIgnoreCase(type)) data.put("week", week);
+        else                               data.put("month", month);
+        data.put("count", count);
+        data.put("borrowings", list);
+
+        ResponseData resp = new ResponseData();
+        resp.setSuccess(true);
+        resp.setDesc("Thống kê số lượt mượn và danh sách chi tiết cho " + type);
+        resp.setData(data);
         return new ResponseEntity<>(resp, HttpStatus.OK);
     }
 }

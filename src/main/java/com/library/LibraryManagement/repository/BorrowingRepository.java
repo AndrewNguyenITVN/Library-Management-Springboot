@@ -9,4 +9,6 @@ import java.util.List;
 public interface BorrowingRepository extends JpaRepository<Borrowing, Integer> {
     List<Borrowing> findByIdentityCardIdentityCard(String identityCard);
     List<Borrowing> findByDueDateBeforeAndStatusFalse(Date date);
+    long countByBorrowedAtBetween(Date startDate, Date endDate);
+    List<Borrowing> findByBorrowedAtBetween(Date startDate, Date endDate);
 }
