@@ -1,4 +1,4 @@
-package com.library.LibraryManagement.service;
+package com.library.LibraryManagement.security;
 
 import com.library.LibraryManagement.entity.User;
 import com.library.LibraryManagement.repository.UserRepository;
