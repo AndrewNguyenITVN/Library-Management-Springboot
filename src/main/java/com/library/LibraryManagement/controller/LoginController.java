@@ -2,9 +2,14 @@ package com.library.LibraryManagement.controller;
 
 import com.library.LibraryManagement.payload.ResponseData;
 import com.library.LibraryManagement.service.imp.LoginServiceImp;
+import com.library.LibraryManagement.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,21 +20,29 @@ public class LoginController {
     @Autowired
     LoginServiceImp loginServiceImp;
 
+    @Autowired
+    JwtUtils jwtUtils;
+
+    @Autowired
+    AuthenticationManager authenticationManager;
+
     @PostMapping("/signin")
     public ResponseEntity<?> signin(@RequestParam String username, @RequestParam String password) {
         ResponseData responseData = new ResponseData();
-
-        if(loginServiceImp.checkLogin(username, password)){
-//            String token = jwtUtils.generateToken(username);
-//            responseData.setData(token);
-            responseData.setData("");
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(username, password)
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String token = jwtUtils.generateToken(username);
+            responseData.setData(token);
             responseData.setSuccess(true);
-        }else {
-            responseData.setData("");
+            return new ResponseEntity<>(responseData, HttpStatus.OK);
+        } catch (Exception e) {
+            responseData.setData("Login failed: " + e.getMessage());
             responseData.setSuccess(false);
+            return new ResponseEntity<>(responseData, HttpStatus.UNAUTHORIZED);
         }
-        return new ResponseEntity<>(responseData, HttpStatus.OK);
-
     }
 
 

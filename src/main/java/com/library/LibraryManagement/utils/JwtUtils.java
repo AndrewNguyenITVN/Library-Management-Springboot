@@ -19,6 +19,16 @@ public class JwtUtils {
         return jws;
     }
 
+    public String getUsernameFromToken(String token) {
+        SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(privateKey));
+        return Jwts.parser()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
+    }
+
     public boolean verifyToken(String token){
         try{
             SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(privateKey));

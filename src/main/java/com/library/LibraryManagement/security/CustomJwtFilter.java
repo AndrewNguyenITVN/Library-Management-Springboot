@@ -12,6 +12,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.userdetails.UserDetails;
 
 
 import java.io.IOException;
@@ -23,12 +24,18 @@ public class CustomJwtFilter extends OncePerRequestFilter {
     @Autowired
     JwtUtils jwtUtils;
 
+    @Autowired
+    CustomUserDetailService customUserDetailService;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = getTokenFromHeader(request);
         if(token != null){
             if(jwtUtils.verifyToken(token)){
-                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken("","", new ArrayList<>());
+                String username = jwtUtils.getUsernameFromToken(token);
+                UserDetails userDetails = customUserDetailService.loadUserByUsername(username);
+                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = 
+                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 SecurityContext securityContext = SecurityContextHolder.getContext();
                 securityContext.setAuthentication(usernamePasswordAuthenticationToken);
             }
