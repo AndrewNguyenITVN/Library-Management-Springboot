@@ -3,13 +3,13 @@ package com.library.LibraryManagement.security;
 import com.library.LibraryManagement.entity.User;
 import com.library.LibraryManagement.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.Collections;
 
 @Service
 public class CustomUserDetailService implements UserDetailsService {
@@ -27,7 +27,7 @@ public class CustomUserDetailService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),
                 user.getPassword(),
-                new ArrayList<>()
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
         );
     }
 } 

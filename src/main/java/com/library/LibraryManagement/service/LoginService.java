@@ -5,6 +5,7 @@ import com.library.LibraryManagement.entity.User;
 import com.library.LibraryManagement.repository.UserRepository;
 import com.library.LibraryManagement.service.imp.LoginServiceImp;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -14,6 +15,9 @@ public class LoginService implements LoginServiceImp {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public List<UserDTO> getAllUser() {
@@ -33,14 +37,14 @@ public class LoginService implements LoginServiceImp {
     @Override
     public Boolean checkLogin(String username, String password) {
         User user = userRepository.findByusername(username);
-        return  password.equals(user.getPassword());
+        return  passwordEncoder.matches(password, user.getPassword());
     }
 
     @Override
     public Boolean createUser(String usename, String password, String email, String role) {
         User user = new User();
         user.setUsername(usename);
-        user.setPassword(password);
+        user.setPassword(passwordEncoder.encode(password));
         user.setEmail(email);
         User.Role roleEnum = User.Role.valueOf(role);
         user.setRole(roleEnum);

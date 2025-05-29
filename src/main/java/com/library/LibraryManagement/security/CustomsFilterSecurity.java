@@ -40,24 +40,27 @@ public class CustomsFilterSecurity {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors(Customizer.withDefaults())
-                .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login/**", "/restaurant/file/**", "/api/auth/**").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .authenticationProvider(authenticationProvider());
-        http.addFilterBefore(customJwtFilter, UsernamePasswordAuthenticationFilter.class);
+            .cors(Customizer.withDefaults())
+            .csrf(AbstractHttpConfigurer::disable)
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/login/**", "/api/auth/**").permitAll()
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/staff/**").hasRole("STAFF")
+                .anyRequest().authenticated()
+            )
+            .authenticationProvider(authenticationProvider())
+            .addFilterBefore(customJwtFilter, UsernamePasswordAuthenticationFilter.class);
+        
         return http.build();
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 }
