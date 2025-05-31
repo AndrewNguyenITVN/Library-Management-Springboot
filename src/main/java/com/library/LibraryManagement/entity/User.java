@@ -1,6 +1,7 @@
 package com.library.LibraryManagement.entity;
 
 import jakarta.persistence.*;
+import java.util.Date;
 
 @Entity(name = "user")
 public class User {
@@ -8,21 +9,32 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "username")
+    @Column(name = "username", unique = true, nullable = false)
     private String username;
 
-    @Column(name = "password")
+    @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "email")
+    @Column(name = "email", unique = true)
     private String email;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
     private Role role;
 
+    @Column(name = "created_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
+
     public enum Role {
-        admin,
-        staff
+        admin, staff
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        if (this.createdAt == null) {
+            this.createdAt = new Date();
+        }
     }
 
     public int getId() {
@@ -64,4 +76,13 @@ public class User {
     public void setRole(Role role) {
         this.role = role;
     }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
 }

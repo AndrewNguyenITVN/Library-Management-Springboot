@@ -1,7 +1,6 @@
 package com.library.LibraryManagement.controller;
 
 import com.library.LibraryManagement.dto.BookDTO;
-import com.library.LibraryManagement.entity.Category;
 import com.library.LibraryManagement.payload.ResponseData;
 import com.library.LibraryManagement.service.imp.BookServiceImp;
 import com.library.LibraryManagement.service.imp.FileServiceImp;
@@ -30,22 +29,31 @@ public final class BookController {
         responseData.setDesc("Lấy danh sách sách thành công");
         responseData.setData(bookServiceImp.getAllBook());
         return new ResponseEntity<>(responseData, HttpStatus.OK);
-
     }
 
     @PostMapping("/add-book")
-    public ResponseEntity<?> addBooks(@RequestParam MultipartFile file, String bookSeri,  String nameBook, int categoryId, int stockQuantity)
-    {
-
+    public ResponseEntity<?> addBooks(@RequestParam MultipartFile file,
+                                    @RequestParam String bookSeri,
+                                    @RequestParam String nameBook,
+                                    @RequestParam int categoryId,
+                                    @RequestParam int stockQuantity,
+                                    @RequestParam(required = false) String author,
+                                    @RequestParam(required = false) String publisher,
+                                    @RequestParam(required = false) Integer publishYear,
+                                    @RequestParam(required = false) String isbn,
+                                    @RequestParam(required = false) String description,
+                                    @RequestParam(required = false) String language,
+                                    @RequestParam(required = false) String edition,
+                                    @RequestParam(required = false) Integer pageCount) {
         ResponseData responseData = new ResponseData();
-        boolean isSuccess = bookServiceImp.addBook(file, bookSeri, nameBook, categoryId, stockQuantity);
+        boolean isSuccess = bookServiceImp.addBook(file, bookSeri, nameBook, categoryId, stockQuantity,
+                author, publisher, publishYear, isbn, description, language, edition, pageCount);
         responseData.setData(isSuccess);
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
     @PostMapping("/delete-book")
-    public ResponseEntity<?> deleteBookFromList(@RequestParam int id)
-    {
+    public ResponseEntity<?> deleteBookFromList(@RequestParam int id) {
         ResponseData responseData = new ResponseData();
         boolean isSuccess = bookServiceImp.delBook(id);
         responseData.setData(isSuccess);
@@ -54,12 +62,21 @@ public final class BookController {
 
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updateBook(@PathVariable int id,
-                                        @RequestParam("file") MultipartFile file,
-                                        @RequestParam("bookSeri") String bookSeri,
-                                        @RequestParam("nameBook") String nameBook,
-                                        @RequestParam("stockQuantity") int stockQuantity,
-                                        @RequestParam("categoryId") int categoryId) {
-        boolean isSuccess = bookServiceImp.editBook(id, file, bookSeri, nameBook, stockQuantity, categoryId);
+                                      @RequestParam("file") MultipartFile file,
+                                      @RequestParam("bookSeri") String bookSeri,
+                                      @RequestParam("nameBook") String nameBook,
+                                      @RequestParam("stockQuantity") int stockQuantity,
+                                      @RequestParam("categoryId") int categoryId,
+                                      @RequestParam(required = false) String author,
+                                      @RequestParam(required = false) String publisher,
+                                      @RequestParam(required = false) Integer publishYear,
+                                      @RequestParam(required = false) String isbn,
+                                      @RequestParam(required = false) String description,
+                                      @RequestParam(required = false) String language,
+                                      @RequestParam(required = false) String edition,
+                                      @RequestParam(required = false) Integer pageCount) {
+        boolean isSuccess = bookServiceImp.editBook(id, file, bookSeri, nameBook, stockQuantity, categoryId,
+                author, publisher, publishYear, isbn, description, language, edition, pageCount);
         ResponseData responseData = new ResponseData();
         if (isSuccess) {
             responseData.setData(isSuccess);
@@ -77,7 +94,7 @@ public final class BookController {
             List<BookDTO> result = bookServiceImp.searchBook(bookName);
             responseData.setData(result);
             responseData.setSuccess(true);
-        }catch (Exception e) {
+        } catch (Exception e) {
             responseData.setSuccess(false);
         }
         return new ResponseEntity<>(responseData, HttpStatus.OK);
@@ -90,7 +107,7 @@ public final class BookController {
             BookDTO result = bookServiceImp.searchBookByBookSeri(bookSeri);
             responseData.setData(result);
             responseData.setSuccess(true);
-        }catch (Exception e) {
+        } catch (Exception e) {
             responseData.setSuccess(false);
         }
         return new ResponseEntity<>(responseData, HttpStatus.OK);

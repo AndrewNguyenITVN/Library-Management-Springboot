@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class BookService implements BookServiceImp {
     public List<BookDTO> getAllBook() {
         List<Book> bookList = bookRepository.findAll();
         List<BookDTO> bookDTOList = new ArrayList<>();
-        for(Book book: bookList){
+        for (Book book : bookList) {
             BookDTO bookDTO = new BookDTO();
             bookDTO.setId(book.getId());
             bookDTO.setBookSeri(book.getBookSeri());
@@ -34,58 +35,88 @@ public class BookService implements BookServiceImp {
             bookDTO.setCategoryName(book.getCategoryId().getNameCate());
             bookDTO.setStockQuantity(book.getStockQuantity());
             bookDTO.setImageUrl(book.getImageUrl());
-            bookDTOList.add(bookDTO);
+            bookDTO.setAuthor(book.getAuthor());
+            bookDTO.setPublisher(book.getPublisher());
+            bookDTO.setPublishYear(book.getPublishYear());
+            bookDTO.setIsbn(book.getIsbn());
+            bookDTO.setDescription(book.getDescription());
+            bookDTO.setLanguage(book.getLanguage());
+            bookDTO.setEdition(book.getEdition());
+            bookDTO.setPageCount(book.getPageCount());
+            bookDTO.setRating(book.getRating());
+            bookDTO.setTotalRatings(book.getTotalRatings());
             bookDTO.setCreatedAt(book.getCreatedAt());
+            bookDTOList.add(bookDTO);
         }
         return bookDTOList;
     }
 
     @Override
-    public boolean addBook(MultipartFile file, String bookSeri, String nameBook, int categoryId, int stockQuantity) {
+    public boolean addBook(MultipartFile file, String bookSeri, String nameBook, int categoryId, int stockQuantity,
+                          String author, String publisher, Integer publishYear, String isbn, String description,
+                          String language, String edition, Integer pageCount) {
         boolean isInsertSuccess = false;
-        try{
+        try {
             boolean isSave = fileServiceImp.saveFile(file);
-            if(isSave){
+            if (isSave) {
                 Book book = new Book();
                 book.setImageUrl(file.getOriginalFilename());
                 book.setBookSeri(bookSeri);
                 book.setNameBook(nameBook);
                 book.setStockQuantity(stockQuantity);
+                book.setAuthor(author);
+                book.setPublisher(publisher);
+                book.setPublishYear(publishYear);
+                book.setIsbn(isbn);
+                book.setDescription(description);
+                book.setLanguage(language);
+                book.setEdition(edition);
+                book.setPageCount(pageCount);
+                book.setRating(BigDecimal.ZERO);
+                book.setTotalRatings(0);
+                
                 Category category = new Category();
                 category.setId(categoryId);
                 book.setCategoryId(category);
                 bookRepository.save(book);
                 isInsertSuccess = true;
             }
-        }catch(Exception e){
-            System.out.println("Loi crate book " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Lỗi tạo sách: " + e.getMessage());
         }
         return isInsertSuccess;
-
     }
 
     @Override
-    public boolean editBook(int id, MultipartFile file, String bookSeri, String nameBook, int stockQuantity, int categoryId) {
+    public boolean editBook(int id, MultipartFile file, String bookSeri, String nameBook, int stockQuantity,
+                          int categoryId, String author, String publisher, Integer publishYear, String isbn,
+                          String description, String language, String edition, Integer pageCount) {
         boolean isEditSuccess = false;
         try {
             Book book = bookRepository.findById(id).orElse(null);
             if (book != null) {
-                // Nếu có file mới, lưu file và cập nhật URL hình ảnh
                 if (file != null && !file.isEmpty()) {
                     boolean isSaved = fileServiceImp.saveFile(file);
                     if (isSaved) {
                         book.setImageUrl(file.getOriginalFilename());
                     }
                 }
-                // Cập nhật thông tin khác
                 book.setNameBook(nameBook);
                 book.setStockQuantity(stockQuantity);
                 book.setBookSeri(bookSeri);
+                book.setAuthor(author);
+                book.setPublisher(publisher);
+                book.setPublishYear(publishYear);
+                book.setIsbn(isbn);
+                book.setDescription(description);
+                book.setLanguage(language);
+                book.setEdition(edition);
+                book.setPageCount(pageCount);
+                
                 Category category = new Category();
                 category.setId(categoryId);
                 book.setCategoryId(category);
 
-                // Lưu lại
                 bookRepository.save(book);
                 isEditSuccess = true;
             }
@@ -101,10 +132,10 @@ public class BookService implements BookServiceImp {
         try {
             bookRepository.deleteById(id);
             isDelSuccess = true;
-        }catch (Exception e){
-            System.out.println("Loi delete book " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Lỗi xóa sách: " + e.getMessage());
         }
-        return  isDelSuccess;
+        return isDelSuccess;
     }
 
     @Override
@@ -115,13 +146,25 @@ public class BookService implements BookServiceImp {
         for (Book book : bookList) {
             BookDTO bookDTO = new BookDTO();
             bookDTO.setId(book.getId());
+            bookDTO.setBookSeri(book.getBookSeri());
             bookDTO.setNameBook(book.getNameBook());
+            bookDTO.setCategoryId(book.getCategoryId().getId());
+            bookDTO.setCategoryName(book.getCategoryId().getNameCate());
             bookDTO.setStockQuantity(book.getStockQuantity());
             bookDTO.setImageUrl(book.getImageUrl());
+            bookDTO.setAuthor(book.getAuthor());
+            bookDTO.setPublisher(book.getPublisher());
+            bookDTO.setPublishYear(book.getPublishYear());
+            bookDTO.setIsbn(book.getIsbn());
+            bookDTO.setDescription(book.getDescription());
+            bookDTO.setLanguage(book.getLanguage());
+            bookDTO.setEdition(book.getEdition());
+            bookDTO.setPageCount(book.getPageCount());
+            bookDTO.setRating(book.getRating());
+            bookDTO.setTotalRatings(book.getTotalRatings());
             bookDTO.setCreatedAt(book.getCreatedAt());
             bookDTOList.add(bookDTO);
         }
-
         return bookDTOList;
     }
 
@@ -133,10 +176,21 @@ public class BookService implements BookServiceImp {
         bookDTO.setId(book.getId());
         bookDTO.setBookSeri(book.getBookSeri());
         bookDTO.setNameBook(book.getNameBook());
+        bookDTO.setCategoryId(book.getCategoryId().getId());
+        bookDTO.setCategoryName(book.getCategoryId().getNameCate());
         bookDTO.setStockQuantity(book.getStockQuantity());
         bookDTO.setImageUrl(book.getImageUrl());
+        bookDTO.setAuthor(book.getAuthor());
+        bookDTO.setPublisher(book.getPublisher());
+        bookDTO.setPublishYear(book.getPublishYear());
+        bookDTO.setIsbn(book.getIsbn());
+        bookDTO.setDescription(book.getDescription());
+        bookDTO.setLanguage(book.getLanguage());
+        bookDTO.setEdition(book.getEdition());
+        bookDTO.setPageCount(book.getPageCount());
+        bookDTO.setRating(book.getRating());
+        bookDTO.setTotalRatings(book.getTotalRatings());
         bookDTO.setCreatedAt(book.getCreatedAt());
-
 
         return bookDTO;
     }

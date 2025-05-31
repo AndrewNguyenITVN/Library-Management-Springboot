@@ -1,5 +1,6 @@
 package com.library.LibraryManagement.controller;
 
+import com.library.LibraryManagement.entity.User.Role;
 import com.library.LibraryManagement.payload.ResponseData;
 import com.library.LibraryManagement.service.imp.LoginServiceImp;
 import com.library.LibraryManagement.utils.JwtUtils;
@@ -45,22 +46,22 @@ public class LoginController {
         }
     }
 
-
     @PostMapping("/add-user")
-    public ResponseEntity<?> createUSer(
+    public ResponseEntity<?> createUser(
             @RequestParam String username,
             @RequestParam String password,
             @RequestParam String email,
-            @RequestParam String role){
+            @RequestParam String role) {
         ResponseData responseData = new ResponseData();
 
-        if(loginServiceImp.createUser(username,password, email, role)){
+        if (loginServiceImp.createUser(username, password, email, role)) {
             responseData.setData("");
             responseData.setSuccess(true);
-        }else {
+        } else {
             responseData.setData("");
             responseData.setSuccess(false);
         }
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
+
 }

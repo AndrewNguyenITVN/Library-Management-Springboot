@@ -1,6 +1,8 @@
 package com.library.LibraryManagement.controller;
 
 import com.library.LibraryManagement.dto.ReaderDTO;
+import com.library.LibraryManagement.entity.Reader.CardType;
+import com.library.LibraryManagement.entity.Reader.ReaderStatus;
 import com.library.LibraryManagement.payload.ResponseData;
 import com.library.LibraryManagement.service.imp.ReaderServiceImp;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,12 +21,17 @@ public class ReaderController {
 
     @PostMapping("/insert-reader")
     public ResponseEntity<?> insertReader(@RequestParam String nameReader,
-                                                        @RequestParam String identityCard,
-                                                        @RequestParam String phone) {
+                                        @RequestParam String identityCard,
+                                        @RequestParam String phone,
+                                        @RequestParam(required = false) String email,
+                                        @RequestParam(required = false) String address,
+                                        @RequestParam(required = false) String dateOfBirth,
+                                        @RequestParam(required = false) CardType cardType,
+                                        @RequestParam(required = false) String cardExpiryDate) {
         ResponseData responseData = new ResponseData();
-        boolean success = readerServiceImp.insertReader(nameReader, identityCard, phone);
+        boolean success = readerServiceImp.insertReader(nameReader, identityCard, phone, email, address,
+                dateOfBirth, cardType, cardExpiryDate);
         responseData.setSuccess(true);
-
         responseData.setData(success);
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
@@ -33,7 +40,7 @@ public class ReaderController {
     public ResponseEntity<?> getAllReaders() {
         ResponseData responseData = new ResponseData();
         responseData.setSuccess(true);
-        responseData.setDesc("Lấy danh nguoi doc thành công");
+        responseData.setDesc("Lấy danh sách người đọc thành công");
         responseData.setData(readerServiceImp.getAllReaders());
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
@@ -43,8 +50,7 @@ public class ReaderController {
         ResponseData responseData = new ResponseData();
         responseData.setData(readerServiceImp.searchReaderByName(nameReader));
         responseData.setSuccess(true);
-        responseData.setDesc("Lấy danh nguoi doc thành công");
-
+        responseData.setDesc("Lấy danh sách người đọc thành công");
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
@@ -53,9 +59,27 @@ public class ReaderController {
         ResponseData responseData = new ResponseData();
         responseData.setData(readerServiceImp.searchReaderByIdentityCard(identityCard));
         responseData.setSuccess(true);
-        responseData.setDesc("Tìm danh sách nguoi doc thành công");
-
+        responseData.setDesc("Tìm danh sách người đọc thành công");
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> updateReader(@PathVariable int id,
+                                        @RequestParam(required = false) String nameReader,
+                                        @RequestParam(required = false) String phone,
+                                        @RequestParam(required = false) String email,
+                                        @RequestParam(required = false) String address,
+                                        @RequestParam(required = false) String dateOfBirth,
+                                        @RequestParam(required = false) CardType cardType,
+                                        @RequestParam(required = false) String cardExpiryDate,
+                                        @RequestParam(required = false) ReaderStatus status) {
+        ResponseData responseData = new ResponseData();
+        boolean success = readerServiceImp.updateReader(id, nameReader, phone, email, address,
+                dateOfBirth, cardType, cardExpiryDate, status);
+        responseData.setSuccess(success);
+        responseData.setData(success);
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
+    }
+
 }
 

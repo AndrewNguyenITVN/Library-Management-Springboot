@@ -1,25 +1,40 @@
 package com.library.LibraryManagement.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.library.LibraryManagement.entity.Borrowing.DamageStatus;
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class BorrowingDTO {
-    private int idBorrow;
+    private int id;
     private String identityCard;
-    private String phone;
     private String bookSeri;
     private String bookName;
     private String readerName;
+    private String phone;
+    
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private Date borrowedAt;
-    private Date returnedAt;
-    private Boolean status;
+    
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private Date dueDate;
+    
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date returnedAt;
+    
+    private Integer status;
+    private BigDecimal fineAmount;
+    private Boolean finePaid;
+    private DamageStatus damageStatus;
+    private BigDecimal damageFine;
+    private String notes;
 
-    public int getIdBorrow() {
-        return idBorrow;
+    public int getId() {
+        return id;
     }
 
-    public void setIdBorrow(int idBorrow) {
-        this.idBorrow = idBorrow;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getIdentityCard() {
@@ -54,28 +69,20 @@ public class BorrowingDTO {
         this.readerName = readerName;
     }
 
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
     public Date getBorrowedAt() {
         return borrowedAt;
     }
 
     public void setBorrowedAt(Date borrowedAt) {
         this.borrowedAt = borrowedAt;
-    }
-
-    public Date getReturnedAt() {
-        return returnedAt;
-    }
-
-    public void setReturnedAt(Date returnedAt) {
-        this.returnedAt = returnedAt;
-    }
-
-    public Boolean getStatus() {
-        return status;
-    }
-
-    public void setStatus(Boolean status) {
-        this.status = status;
     }
 
     public Date getDueDate() {
@@ -86,11 +93,59 @@ public class BorrowingDTO {
         this.dueDate = dueDate;
     }
 
-    public String getPhone() {
-        return phone;
+    public Date getReturnedAt() {
+        return returnedAt;
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
+    public void setReturnedAt(Date returnedAt) {
+        this.returnedAt = returnedAt;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public BigDecimal getFineAmount() {
+        return fineAmount;
+    }
+
+    public void setFineAmount(BigDecimal fineAmount) {
+        this.fineAmount = fineAmount;
+    }
+
+    public Boolean getFinePaid() {
+        return finePaid;
+    }
+
+    public void setFinePaid(Boolean finePaid) {
+        this.finePaid = finePaid;
+    }
+
+    public DamageStatus getDamageStatus() {
+        return damageStatus;
+    }
+
+    public void setDamageStatus(DamageStatus damageStatus) {
+        this.damageStatus = damageStatus;
+    }
+
+    public BigDecimal getDamageFine() {
+        return damageFine;
+    }
+
+    public void setDamageFine(BigDecimal damageFine) {
+        this.damageFine = damageFine;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 }

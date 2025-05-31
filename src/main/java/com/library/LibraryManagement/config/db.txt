@@ -1,0 +1,427 @@
+-- Xóa cơ sở dữ liệu nếu tồn tại để tránh lỗi khi chạy lại script
+DROP DATABASE IF EXISTS `library_management`;
+
+-- Tạo cơ sở dữ liệu
+CREATE DATABASE `library_management` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE `library_management`;
+
+-- Bảng: category (Danh mục sách)
+CREATE TABLE `category` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name_cate` VARCHAR(250) NOT NULL UNIQUE,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Bảng: book_author (Tác giả sách)
+CREATE TABLE `book_author` (
+  `id` INT PRIMARY KEY AUTO_INCREMENT,
+  `name` VARCHAR(255) NOT NULL,
+  `biography` TEXT,
+  `birth_date` DATE,
+  `death_date` DATE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Bảng: book (Sách) - Đã nâng cấp
+CREATE TABLE `book` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `book_seri` VARCHAR(50) NOT NULL UNIQUE,
+  `name_book` VARCHAR(250) NOT NULL,
+  `category_id` INT NOT NULL,
+  `stock_quantity` INT NOT NULL,
+  `image_url` VARCHAR(500),
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `author` VARCHAR(255), -- Tác giả chính hoặc đồng tác giả (có thể dùng bảng book_author_mapping cho nhiều tác giả)
+  `publisher` VARCHAR(255),
+  `publish_year` INT,
+  `isbn` VARCHAR(20) UNIQUE, -- ISBN thường là 10 hoặc 13 ký tự
+  `price` DECIMAL(10,2),
+  `description` TEXT,
+  `language` VARCHAR(50),
+  `edition` VARCHAR(50),
+  `page_count` INT,
+  `rating` DECIMAL(3,2) DEFAULT 0.00,
+  `total_ratings` INT DEFAULT 0,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `fk_book_category`
+    FOREIGN KEY (`category_id`) REFERENCES `category`(`id`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Bảng: book_author_mapping (Liên kết sách và tác giả - Mối quan hệ nhiều-nhiều)
+CREATE TABLE `book_author_mapping` (
+  `book_id` INT NOT NULL,
+  `author_id` INT NOT NULL,
+  PRIMARY KEY (`book_id`, `author_id`),
+  CONSTRAINT `fk_map_book`
+    FOREIGN KEY (`book_id`) REFERENCES `book`(`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_map_author`
+    FOREIGN KEY (`author_id`) REFERENCES `book_author`(`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Bảng: reader (Bạn đọc) - Đã nâng cấp
+CREATE TABLE `reader` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name_reader` VARCHAR(250) NOT NULL,
+  `identity_card` VARCHAR(15) NOT NULL UNIQUE, -- Căn cước công dân/CMND
+  `phone` VARCHAR(15) NOT NULL UNIQUE,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `email` VARCHAR(255) UNIQUE,
+  `address` TEXT,
+  `date_of_birth` DATE,
+  `card_type` ENUM('STUDENT', 'TEACHER', 'STAFF', 'OTHER') DEFAULT 'OTHER',
+  `card_expiry_date` DATE, -- Ngày hết hạn thẻ (nếu có, có thể dùng bảng library_card chi tiết hơn)
+  `total_borrowed` INT DEFAULT 0,
+  `total_overdue` INT DEFAULT 0,
+  `status` ENUM('ACTIVE', 'SUSPENDED', 'BLOCKED') DEFAULT 'ACTIVE',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Bảng: library_card (Thẻ thư viện)
+CREATE TABLE `library_card` (
+  `id` INT PRIMARY KEY AUTO_INCREMENT,
+  `reader_id` INT NOT NULL,
+  `card_number` VARCHAR(50) UNIQUE NOT NULL,
+  `issue_date` DATE NOT NULL,
+  `expiry_date` DATE NOT NULL,
+  `status` ENUM('ACTIVE', 'EXPIRED', 'LOST', 'CANCELLED') DEFAULT 'ACTIVE',
+  CONSTRAINT `fk_librarycard_reader`
+    FOREIGN KEY (`reader_id`) REFERENCES `reader`(`id`)
+    ON DELETE CASCADE  -- Nếu xóa reader thì xóa luôn thẻ thư viện liên quan
+    ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Bảng: borrowing (Lượt mượn sách) - Đã nâng cấp
+CREATE TABLE `borrowing` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `identity_card` VARCHAR(15) NOT NULL, -- Giữ lại để tương thích với dữ liệu gốc, nhưng nên dùng reader_id
+  `book_seri` VARCHAR(50) NOT NULL,     -- Giữ lại để tương thích với dữ liệu gốc, nhưng nên dùng book_id
+  `reader_id` INT,                      -- Thêm reader_id để join dễ hơn
+  `book_id` INT,                        -- Thêm book_id để join dễ hơn
+  `borrowed_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `due_date` TIMESTAMP NOT NULL, -- DEFAULT (CURRENT_TIMESTAMP + INTERVAL 7 DAY) được đặt khi INSERT
+  `returned_at` TIMESTAMP NULL DEFAULT NULL,
+  `status` TINYINT NOT NULL DEFAULT 0, -- 0: Đang mượn, 1: Đã trả, 2: Quá hạn
+  `fine_amount` DECIMAL(10,2) DEFAULT 0.00,
+  `fine_paid` BOOLEAN DEFAULT FALSE,
+  `damage_status` ENUM('NONE', 'MINOR', 'MAJOR', 'LOST') DEFAULT 'NONE',
+  `damage_fine` DECIMAL(10,2) DEFAULT 0.00,
+  `notes` TEXT,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `fk_borrowing_reader_identity`
+    FOREIGN KEY (`identity_card`) REFERENCES `reader`(`identity_card`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_borrowing_book_seri`
+    FOREIGN KEY (`book_seri`) REFERENCES `book`(`book_seri`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_borrowing_reader_id`  -- Khóa ngoại mới
+    FOREIGN KEY (`reader_id`) REFERENCES `reader`(`id`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_borrowing_book_id`    -- Khóa ngoại mới
+    FOREIGN KEY (`book_id`) REFERENCES `book`(`id`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Bảng: book_reservation (Đặt trước sách)
+CREATE TABLE `book_reservation` (
+  `id` INT PRIMARY KEY AUTO_INCREMENT,
+  `book_id` INT NOT NULL,
+  `reader_id` INT NOT NULL,
+  `reservation_date` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `expiry_date` TIMESTAMP, -- Ví dụ: CURRENT_TIMESTAMP + INTERVAL 3 DAY
+  `status` ENUM('PENDING', 'APPROVED', 'CANCELLED', 'EXPIRED', 'FULFILLED') DEFAULT 'PENDING',
+  CONSTRAINT `fk_reservation_book`
+    FOREIGN KEY (`book_id`) REFERENCES `book`(`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_reservation_reader`
+    FOREIGN KEY (`reader_id`) REFERENCES `reader`(`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Bảng: notification (Thông báo)
+CREATE TABLE `notification` (
+  `id` INT PRIMARY KEY AUTO_INCREMENT,
+  `reader_id` INT NOT NULL,
+  `type` ENUM('DUE_DATE', 'OVERDUE', 'RESERVATION_APPROVED', 'RESERVATION_EXPIRING', 'RESERVATION_FULFILLED', 'SYSTEM_MESSAGE', 'NEW_BOOK_AVAILABLE'),
+  `message` TEXT NOT NULL,
+  `is_read` BOOLEAN DEFAULT FALSE,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT `fk_notification_reader`
+    FOREIGN KEY (`reader_id`) REFERENCES `reader`(`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Bảng: fine_payment (Thanh toán tiền phạt)
+CREATE TABLE `fine_payment` (
+  `id` INT PRIMARY KEY AUTO_INCREMENT,
+  `borrowing_id` INT NOT NULL,
+  `amount` DECIMAL(10,2) NOT NULL,
+  `payment_date` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `payment_method` ENUM('CASH', 'CARD', 'TRANSFER', 'OTHER'),
+  `status` ENUM('PENDING', 'COMPLETED', 'FAILED', 'REFUNDED') DEFAULT 'PENDING',
+  `notes` TEXT,
+  CONSTRAINT `fk_finepayment_borrowing`
+    FOREIGN KEY (`borrowing_id`) REFERENCES `borrowing`(`id`)
+    ON DELETE RESTRICT -- Không cho xóa lượt mượn nếu có thanh toán liên quan
+    ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Bảng: book_location (Vị trí sách trong thư viện)
+CREATE TABLE `book_location` (
+  `id` INT PRIMARY KEY AUTO_INCREMENT,
+  `book_id` INT NOT NULL UNIQUE, -- Mỗi cuốn sách chỉ có một vị trí cụ thể
+  `shelf_number` VARCHAR(50) NOT NULL,
+  `row_number` VARCHAR(50),
+  `position` VARCHAR(50),
+  `notes` TEXT,
+  CONSTRAINT `fk_booklocation_book`
+    FOREIGN KEY (`book_id`) REFERENCES `book`(`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Bảng: user (Người dùng hệ thống - admin, staff)
+CREATE TABLE `user` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `username` VARCHAR(100) NOT NULL UNIQUE,
+  `password` VARCHAR(250) NOT NULL, -- Nên lưu trữ mật khẩu đã được hash
+  `email` VARCHAR(250) UNIQUE,
+  `role` ENUM('admin','staff') NOT NULL DEFAULT 'staff',
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `last_login` TIMESTAMP NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- ------------------------------------------------------------------------------------
+-- PHẦN NHẬP DỮ LIỆU MẪU
+-- ------------------------------------------------------------------------------------
+
+-- 3.1 category
+INSERT INTO `category` (`name_cate`) VALUES
+  ('Văn học'), ('Khoa học'), ('Lịch sử'), ('Kinh tế'), ('Công nghệ'),
+  ('Tâm lý học'), ('Triết học'), ('Nghệ thuật'), ('Phiêu lưu'), ('Tài chính'),
+  ('Giáo trình'), ('Truyện tranh');
+
+-- 3.x book_author
+INSERT INTO `book_author` (`id`, `name`, `biography`, `birth_date`, `death_date`) VALUES
+  (1, 'Nam Cao', 'Một nhà văn hiện thực lớn của Việt Nam.', '1917-10-29', '1951-11-30'),
+  (2, 'Stephen Hawking', 'Nhà vật lý lý thuyết, vũ trụ học người Anh.', '1942-01-08', '2018-03-14'),
+  (3, 'Trần Trọng Kim', 'Học giả, nhà giáo dục, nhà nghiên cứu lịch sử, văn hóa, tôn giáo Việt Nam.', '1883-01-01', '1953-12-02'),
+  (4, 'Paul Samuelson', 'Nhà kinh tế học người Mỹ, đoạt giải Nobel Kinh tế năm 1970.', '1915-05-15', '2009-12-13'),
+  (5, 'Stuart Russell', 'Nhà khoa học máy tính người Anh, nổi tiếng với công trình về trí tuệ nhân tạo.', '1962-01-01', NULL),
+  (6, 'Ngô Tất Tố', 'Nhà văn, nhà báo, nhà nghiên cứu văn hóa Việt Nam.', '1894-01-01', '1954-04-20'),
+  (7, 'Tô Hoài', 'Nhà văn nổi tiếng của Việt Nam với tác phẩm Dế Mèn phiêu lưu ký.', '1920-09-27', '2014-07-06'),
+  (8, 'Nhiều tác giả', 'Sách được biên soạn bởi nhiều tác giả', NULL, NULL);
+
+
+-- 3.2 book (Cập nhật và thêm các trường mới)
+-- Lưu ý: `category_id` phải tương ứng với `id` trong bảng `category`
+-- `author` là tên tác giả chính, `isbn` là mã số sách quốc tế
+INSERT INTO `book` (`book_seri`,`name_book`,`category_id`,`stock_quantity`,`image_url`, `author`, `publisher`, `publish_year`, `isbn`, `price`, `description`, `language`, `edition`, `page_count`, `rating`, `total_ratings`) VALUES
+  ('BK001','Lão Hạc',1,10,'https://example.com/laohac.jpg','Nam Cao','NXB Văn Học',2020,'978-604-1-12345-1',75000.00,'Truyện ngắn hiện thực nổi tiếng.','Tiếng Việt','Tái bản lần 5',120,4.5,150),
+  ('BK002','Vũ Trụ Và Hố Đen',2,5,'https://example.com/vutru.jpg','Stephen Hawking','NXB Trẻ',2018,'978-604-1-12346-8',150000.00,'Khám phá những bí ẩn của vũ trụ.','Tiếng Việt','Bản dịch',350,4.8,200),
+  ('BK003','Việt Nam Sử Lược',3,7,'https://example.com/sulvietnam.jpg','Trần Trọng Kim','NXB Kim Đồng',2019,'978-604-2-01234-0',120000.00,'Tổng quan lịch sử Việt Nam.','Tiếng Việt','In lần 3',500,4.6,180),
+  ('BK004','Kinh Tế Học Hiện Đại',4,8,'https://example.com/kinhte.jpg','Paul Samuelson','NXB Kinh Tế Quốc Dân',2021,'978-604-3-11223-7',250000.00,'Giáo trình kinh tế học cơ bản.','Tiếng Việt','Cập nhật',700,4.7,120),
+  ('BK005','Trí Tuệ Nhân Tạo: Một Cách Tiếp Cận Hiện Đại',5,4,'https://example.com/ai.jpg','Stuart Russell & Peter Norvig','NXB Khoa Học Kỹ Thuật',2022,'978-604-4-50334-5',350000.00,'Sách chuyên khảo về AI.','Tiếng Anh','Phiên bản 4',1100,4.9,90),
+  ('BK006','Số Đỏ',1,12,'https://example.com/sodo.jpg','Vũ Trọng Phụng','NXB Hội Nhà Văn',2017,'978-604-5-00112-3',90000.00,'Tiểu thuyết trào phúng kinh điển.','Tiếng Việt','Tái bản',300,4.4,130),
+  ('BK007','Chiến Tranh Và Hòa Bình',1,9,'https://example.com/chientranhhoabinh.jpg','Leo Tolstoy','NXB Văn Học',2015,'978-604-1-23456-0',450000.00,'Tiểu thuyết sử thi Nga.','Tiếng Việt','Dịch đầy đủ',1225,4.9,250),
+  ('BK008','Lịch Sử Thế Giới',3,6,'https://example.com/lichsuthgioi.jpg','J. M. Roberts','NXB Thế Giới',2020,'978-604-7-78901-2',320000.00,'Từ cổ đại đến hiện đại.','Tiếng Việt','Bản dịch',900,4.5,110),
+  ('BK009','Nguyên Lý Marketing',4,11,'https://example.com/quantrikinhdoanh.jpg','Philip Kotler & Gary Armstrong','NXB Tài Chính',2023,'978-604-8-01234-5',280000.00,'Sách marketing hàng đầu.','Tiếng Việt','Phiên bản 17',650,4.8,160),
+  ('BK010','Công Nghệ Phần Mềm',5,15,'https://example.com/congngheps.jpg','Ian Sommerville','NXB Bách Khoa Hà Nội',2021,'978-604-9-12378-9',220000.00,'Giáo trình phát triển phần mềm.','Tiếng Việt','Phiên bản 10',750,4.6,100),
+  ('BK011','Dế Mèn Phiêu Lưu Ký',9,7,'https://example.com/demen.jpg','Tô Hoài','NXB Kim Đồng',2022,'978-604-2-23456-7',65000.00,'Truyện thiếu nhi kinh điển.','Tiếng Việt','In màu',180,4.7,300),
+  ('BK012','Vật Lý Đại Cương Tập 1',11,4,'https://example.com/vatly.jpg','Lương Duyên Bình (Chủ biên)','NXB Giáo Dục',2019,'978-604-0-34567-8',110000.00,'Cơ học và Nhiệt học.','Tiếng Việt','Tái bản',450,4.3,80),
+  ('BK013','Lược Sử Loài Người',3,10,'https://example.com/luocsu.jpg','Yuval Noah Harari','NXB Tri Thức',2018,'978-604-6-45678-9',180000.00,'Từ động vật thành chúa tể.','Tiếng Việt','Bản dịch',520,4.9,400),
+  ('BK014','Kinh Tế Lượng',10,5,'https://example.com/kinhteluong.jpg','Damodar Gujarati','NXB Thống Kê',2020,'978-604-0-56789-0',190000.00,'Ứng dụng trong phân tích kinh tế.','Tiếng Việt','Phiên bản 5',600,4.5,70),
+  ('BK015','Deep Learning',5,3,'https://example.com/deeplearning.jpg','Ian Goodfellow, Yoshua Bengio, Aaron Courville','NXB Thông Tin Truyền Thông',2021,'978-604-0-67890-1',450000.00,'Sách nền tảng về học sâu.','Tiếng Anh','Nguyên bản',800,4.9,120),
+  ('BK016','Tắt Đèn',1,8,'https://example.com/tatden.jpg','Ngô Tất Tố','NXB Văn Học',2019,'978-604-1-09876-5',70000.00,'Hiện thực phê phán trước 1945.','Tiếng Việt','In lại',250,4.6,140),
+  ('BK017','Giải Tích Toán Học Tập 1',11,6,'https://example.com/toanhoc.jpg','Nguyễn Đình Trí (Chủ biên)','NXB Giáo Dục',2020,'978-604-0-78901-2',95000.00,'Giáo trình cho sinh viên kỹ thuật.','Tiếng Việt','Tái bản',380,4.4,95),
+  ('BK018','Hiến Pháp Nước CHXHCN Việt Nam',3,9,'https://example.com/hienphap.jpg','Quốc Hội Việt Nam','NXB Chính Trị Quốc Gia Sự Thật',2013,'978-604-5-78901-2',50000.00,'Văn bản pháp lý quan trọng.','Tiếng Việt','Chính thức',150,4.2,60),
+  ('BK019','Phân Tích Tài Chính Doanh Nghiệp',10,7,'https://example.com/phanhoctai.jpg','Nguyễn Tấn Bình','NXB Tài Chính',2022,'978-604-8-89012-3',260000.00,'Hướng dẫn phân tích báo cáo tài chính.','Tiếng Việt','Cập nhật',550,4.7,115),
+  ('BK020','An Toàn Thông Tin',5,5,'https://example.com/antoantt.jpg','William Stallings','NXB Bách Khoa Hà Nội',2023,'978-604-9-90123-4',320000.00,'Các nguyên tắc và thực hành.','Tiếng Việt','Dịch thuật',700,4.6,85);
+
+-- 3.x book_author_mapping (Liên kết sách với tác giả)
+-- Sử dụng `id` từ bảng `book` và `id` từ bảng `book_author`
+INSERT INTO `book_author_mapping` (`book_id`, `author_id`) VALUES
+  (1, 1), -- Lão Hạc - Nam Cao
+  (2, 2), -- Vũ Trụ Và Hố Đen - Stephen Hawking
+  (3, 3), -- Việt Nam Sử Lược - Trần Trọng Kim
+  (4, 4), -- Kinh Tế Học Hiện Đại - Paul Samuelson
+  (5, 5), -- Trí Tuệ Nhân Tạo - Stuart Russell (và Peter Norvig, nhưng trong book_author chỉ có Stuart)
+  (6, 8), -- Số Đỏ - Vũ Trọng Phụng (thêm Vũ Trọng Phụng vào book_author nếu muốn chi tiết)
+  (7, 8), -- Chiến Tranh Và Hòa Bình - Leo Tolstoy (thêm Leo Tolstoy)
+  (11, 7), -- Dế Mèn Phiêu Lưu Ký - Tô Hoài
+  (16, 6); -- Tắt Đèn - Ngô Tất Tố
+-- Các sách khác có thể thêm mapping tương tự, hoặc nếu tác giả là "Nhiều tác giả" thì có thể dùng author_id = 8
+
+-- 3.3 reader (Cập nhật và thêm các trường mới)
+-- `id` sẽ tự tăng, không cần nhập
+INSERT INTO `reader` (`name_reader`,`identity_card`,`phone`, `email`, `address`, `date_of_birth`, `card_type`, `card_expiry_date`, `status`) VALUES
+  ('Nguyễn Văn A','123456789','0901234567','nguyenvana@example.com','123 Đường ABC, Quận 1, TP. HCM','1990-01-15','STUDENT','2026-01-15','ACTIVE'),
+  ('Trần Thị B','987654321','0902345678','tranthib@example.com','456 Đường XYZ, Quận 2, TP. HCM','1985-05-20','TEACHER','2025-12-31','ACTIVE'),
+  ('Lê Văn C','456789123','0903456789','levanc@example.com','789 Đường KLM, Quận 3, TP. HCM','2000-11-01','STUDENT','2027-11-01','ACTIVE'),
+  ('Phạm Thị D','789123456','0904567890','phamthid@example.com','101 Đường QWE, Quận 4, TP. HCM','1995-07-10','STAFF','2026-07-10','SUSPENDED'),
+  ('Hoàng Văn E','321654987','0905678901','hoangvane@example.com','202 Đường RTY, Quận 5, TP. HCM','1978-03-25','OTHER','2025-08-01','ACTIVE'),
+  ('Nguyễn Thị F','112233445','0912345678','nguyenthif@example.com','303 Phố Mới, Quận Hoàn Kiếm, Hà Nội','1998-02-10','STUDENT','2026-02-10','ACTIVE'),
+  ('Trần Văn G','223344556','0923456789','tranvang@example.com','404 Ngõ Cũ, Quận Ba Đình, Hà Nội','1992-09-15','STAFF','2025-09-15','ACTIVE'),
+  ('Lê Thị H','334455667','0934567890','lethih@example.com','505 Đường Ven Hồ, Quận Tây Hồ, Hà Nội','2001-12-20','STUDENT','2027-12-20','BLOCKED'),
+  ('Phan Văn I','445566778','0945678901','phanvani@example.com','606 Chung Cư An Bình, Quận Thanh Xuân, Hà Nội','1980-06-05','TEACHER','2026-06-05','ACTIVE'),
+  ('Hoàng Thị J','556677889','0956789012','hoangthij@example.com','707 Khu Tập Thể, Quận Đống Đa, Hà Nội','1999-04-30','OTHER','2025-04-30','ACTIVE'),
+  ('Đặng Văn K','667788990','0967890123','dangvank@example.com','111 Đường Hoa, TP. Đà Nẵng','1993-08-12','STAFF','2026-08-12','ACTIVE'),
+  ('Võ Thị L','778899001','0978901234','vothil@example.com','222 Bãi Biển, TP. Nha Trang','2002-01-25','STUDENT','2028-01-25','ACTIVE'),
+  ('Ngô Văn M','889900112','0989012345','ngovanm@example.com','333 Phố Cổ, TP. Hội An','1988-10-03','OTHER','2025-10-03','ACTIVE'),
+  ('Bùi Thị N','990011223','0990123456','buithin@example.com','444 Đồi Chè, TP. Đà Lạt','1997-07-19','TEACHER','2026-07-19','SUSPENDED'),
+  ('Đỗ Văn O','101112131','0901123450','dovano@example.com','555 Đồng Lúa, Tỉnh Cần Thơ','1991-05-22','STAFF','2025-05-22','ACTIVE');
+-- Thêm 10 bạn đọc nữa cho đủ 25
+INSERT INTO `reader` (`name_reader`,`identity_card`,`phone`, `email`, `address`, `date_of_birth`, `card_type`, `card_expiry_date`, `status`) VALUES
+  ('Phùng Thị P','121314151','0913141516','phungthip@example.com','666 Hẻm Nhỏ, Quận Bình Thạnh, TP. HCM','2003-03-03','STUDENT','2028-03-03','ACTIVE'),
+  ('Vũ Văn Q','131415161','0924151617','vuvanq@example.com','777 Biệt Thự Ven Sông, Quận 7, TP. HCM','1975-11-11','TEACHER','2026-11-11','ACTIVE'),
+  ('Tạ Thị R','141516171','0935161718','tathir@example.com','888 Chung Cư Cao Cấp, Quận Thủ Đức, TP. HCM','1996-09-09','STAFF','2025-09-09','ACTIVE'),
+  ('Trịnh Văn S','151617181','0946171819','trinhvans@example.com','999 Nhà Mặt Tiền, Quận Gò Vấp, TP. HCM','1989-08-08','OTHER','2026-08-08','BLOCKED'),
+  ('Lâm Thị T','161718191','0957181920','lamthit@example.com','121 Làng Hoa, Quận 12, TP. HCM','2000-02-28','STUDENT','2027-02-28','ACTIVE'),
+  ('Chu Văn U','171819202','0968192021','chuvanu@example.com','232 Phố Sách, Quận Hai Bà Trưng, Hà Nội','1994-06-17','TEACHER','2025-06-17','ACTIVE'),
+  ('Hà Thị V','181920212','0979202122','hathiv@example.com','343 Ngõ Vắng, Quận Long Biên, Hà Nội','1983-12-01','STAFF','2026-12-01','ACTIVE'),
+  ('Phạm Văn W','192021222','0980212223','phamvanw@example.com','454 Đường Mới, TP. Hải Phòng','2002-10-10','STUDENT','2028-10-10','SUSPENDED'),
+  ('Quách Thị X','202122232','0991222324','quachthix@example.com','565 Bến Tàu, Tỉnh Quảng Ninh','1979-07-07','OTHER','2025-07-07','ACTIVE'),
+  ('Lý Văn Y','212223242','0902232425','lyvany@example.com','676 Đồi Thông, Tỉnh Lâm Đồng','1990-01-01','TEACHER','2026-01-01','ACTIVE');
+
+-- 3.x library_card
+-- Giả sử reader_id từ 1 đến 25 tương ứng với các reader đã nhập ở trên
+INSERT INTO `library_card` (`reader_id`, `card_number`, `issue_date`, `expiry_date`, `status`) VALUES
+  (1, 'LIB00001', '2024-01-15', '2026-01-15', 'ACTIVE'),
+  (2, 'LIB00002', '2023-12-31', '2025-12-31', 'ACTIVE'),
+  (3, 'LIB00003', '2024-11-01', '2027-11-01', 'ACTIVE'),
+  (4, 'LIB00004', '2023-07-10', '2026-07-10', 'ACTIVE'), -- Reader status là SUSPENDED, card vẫn có thể ACTIVE
+  (5, 'LIB00005', '2023-08-01', '2025-08-01', 'ACTIVE'),
+  (6, 'LIB00006', '2024-02-10', '2026-02-10', 'ACTIVE'),
+  (7, 'LIB00007', '2023-09-15', '2025-09-15', 'ACTIVE'),
+  (8, 'LIB00008', '2022-12-20', '2024-12-20', 'EXPIRED'), -- Reader status là BLOCKED, card EXPIRED
+  (9, 'LIB00009', '2024-06-05', '2026-06-05', 'ACTIVE'),
+  (10, 'LIB00010', '2023-04-30', '2025-04-30', 'ACTIVE'),
+  (11, 'LIB00011', '2023-08-12', '2026-08-12', 'ACTIVE'),
+  (12, 'LIB00012', '2024-01-25', '2028-01-25', 'ACTIVE'),
+  (13, 'LIB00013', '2023-10-03', '2025-10-03', 'LOST'),
+  (14, 'LIB00014', '2023-07-19', '2026-07-19', 'ACTIVE'),
+  (15, 'LIB00015', '2023-05-22', '2025-05-22', 'ACTIVE'),
+  (16, 'LIB00016', '2024-03-03', '2028-03-03', 'ACTIVE'),
+  (17, 'LIB00017', '2023-11-11', '2026-11-11', 'ACTIVE'),
+  (18, 'LIB00018', '2023-09-09', '2025-09-09', 'CANCELLED'),
+  (19, 'LIB00019', '2023-08-08', '2026-08-08', 'ACTIVE'),
+  (20, 'LIB00020', '2024-02-28', '2027-02-28', 'ACTIVE');
+
+
+-- 3.4 borrowing (Cập nhật và thêm các trường mới)
+-- Sử dụng `reader_id` và `book_id` tương ứng với các bản ghi đã tạo.
+-- `due_date` được tính dựa trên `borrowed_at`.
+-- `status`: 0 - đang mượn, 1 - đã trả, 2 - quá hạn (chưa trả)
+-- Chú ý: `book_id` và `reader_id` cần khớp với `id` trong bảng `book` và `reader`
+-- `fine_amount` và `damage_fine` được thêm vào một số bản ghi ví dụ.
+
+
+INSERT INTO `borrowing` (`identity_card`,`book_seri`,`reader_id`,`book_id`,`borrowed_at`,`due_date`,`returned_at`,`status`,`fine_amount`,`fine_paid`,`damage_status`,`damage_fine`,`notes`) VALUES
+  ('123456789','BK001',1,1,'2025-05-01 09:00:00',('2025-05-01 09:00:00' + INTERVAL 7 DAY),'2025-05-07 10:00:00',1,0.00,TRUE,'NONE',0.00,'Trả đúng hạn.'),
+  ('123456789','BK006',1,6,'2025-05-25 14:30:00',('2025-05-25 14:30:00' + INTERVAL 7 DAY),NULL,0,0.00,FALSE,'NONE',0.00,'Đang mượn.'), -- Sửa ngày mượn gần hiện tại hơn
+  ('987654321','BK002',2,2,'2025-05-02 11:15:00',('2025-05-02 11:15:00' + INTERVAL 7 DAY),'2025-05-08 13:00:00',1,0.00,TRUE,'NONE',0.00,'Trả đúng hạn.'),
+  ('987654321','BK007',2,7,'2025-05-26 16:45:00',('2025-05-26 16:45:00' + INTERVAL 7 DAY),NULL,0,0.00,FALSE,'NONE',0.00,'Đang mượn.'),
+  ('456789123','BK003',3,3,'2025-05-03 08:20:00',('2025-05-03 08:20:00' + INTERVAL 7 DAY),'2025-05-12 09:00:00',1,10000.00,TRUE,'MINOR',20000.00,'Trả trễ 2 ngày, sách hơi cong vênh bìa.'), -- Trả trễ, có phạt
+  ('456789123','BK008',3,8,'2025-05-27 12:00:00',('2025-05-27 12:00:00' + INTERVAL 7 DAY),NULL,0,0.00,FALSE,'NONE',0.00,NULL),
+  ('789123456','BK004',4,4,'2025-05-04 10:00:00',('2025-05-04 10:00:00' + INTERVAL 7 DAY),'2025-05-10 09:00:00',1,0.00,TRUE,'NONE',0.00,NULL),
+  ('321654987','BK005',5,5,'2025-05-20 15:30:00',('2025-05-20 15:30:00' + INTERVAL 7 DAY),NULL,2,0.00,FALSE,'NONE',0.00,'Quá hạn, chưa trả.'), -- Quá hạn (giả sử hôm nay là 2025-05-28)
+  ('112233445','BK009',6,9,'2025-05-01 09:30:00',('2025-05-01 09:30:00' + INTERVAL 7 DAY),NULL,2,0.00,FALSE,'NONE',0.00,'Quá hạn, chưa trả.'),
+  ('223344556','BK010',7,10,'2025-05-02 14:00:00',('2025-05-02 14:00:00' + INTERVAL 7 DAY),'2025-05-09 16:00:00',1,0.00,TRUE,'NONE',0.00,NULL),
+  ('334455667','BK011',8,11,'2025-05-03 17:20:00',('2025-05-03 17:20:00' + INTERVAL 7 DAY),NULL,2,0.00,FALSE,'NONE',0.00,'Quá hạn, reader bị khóa.'),
+  ('445566778','BK012',9,12,'2025-05-24 13:15:00',('2025-05-24 13:15:00' + INTERVAL 7 DAY),NULL,0,0.00,FALSE,'NONE',0.00,NULL),
+  ('556677889','BK013',10,13,'2025-05-15 11:45:00',('2025-05-15 11:45:00' + INTERVAL 7 DAY),'2025-05-23 10:00:00',1,5000.00,FALSE,'NONE',0.00,'Trả trễ 1 ngày, chưa đóng phạt.'),
+  ('667788990','BK014',11,14,'2025-05-16 08:55:00',('2025-05-16 08:55:00' + INTERVAL 7 DAY),NULL,2,0.00,FALSE,'NONE',0.00,'Quá hạn.'),
+  ('778899001','BK015',12,15,'2025-05-17 16:10:00',('2025-05-17 16:10:00' + INTERVAL 7 DAY),'2025-05-24 15:00:00',1,0.00,TRUE,'LOST',300000.00,'Báo mất sách, đã đền tiền.'),
+  ('889900112','BK016',13,16,'2025-05-28 09:05:00',('2025-05-28 09:05:00' + INTERVAL 7 DAY),NULL,0,0.00,FALSE,'NONE',0.00,NULL),
+  ('990011223','BK017',14,17,'2025-05-19 12:00:00',('2025-05-19 12:00:00' + INTERVAL 7 DAY),'2025-05-27 11:00:00',1,5000.00,TRUE,'NONE',0.00,'Trả trễ 1 ngày, đã đóng phạt'),
+  ('101112131','BK018',15,18,'2025-05-20 14:25:00',('2025-05-20 14:25:00' + INTERVAL 7 DAY),NULL,2,0.00,FALSE,'NONE',0.00,'Quá hạn.'),
+  ('121314151','BK019',16,19,'2025-05-21 10:10:00',('2025-05-21 10:10:00' + INTERVAL 7 DAY),NULL,0,0.00,FALSE,'NONE',0.00,NULL),
+  ('131415161','BK020',17,20,'2025-05-22 15:35:00',('2025-05-22 15:35:00' + INTERVAL 7 DAY),NULL,0,0.00,FALSE,'NONE',0.00,NULL),
+  ('141516171','BK001',18,1,'2025-05-23 09:45:00',('2025-05-23 09:45:00' + INTERVAL 7 DAY),NULL,0,0.00,FALSE,'NONE',0.00,NULL),
+  ('151617181','BK002',19,2,'2025-05-24 11:55:00',('2025-05-24 11:55:00' + INTERVAL 7 DAY),NULL,0,0.00,FALSE,'NONE',0.00,NULL),
+  ('161718191','BK003',20,3,'2025-05-25 13:30:00',('2025-05-25 13:30:00' + INTERVAL 7 DAY),NULL,0,0.00,FALSE,'NONE',0.00,NULL),
+  ('171819202','BK004',21,4,'2025-05-26 14:20:00',('2025-05-26 14:20:00' + INTERVAL 7 DAY),NULL,0,0.00,FALSE,'NONE',0.00,NULL),
+  ('181920212','BK005',22,5,'2025-05-27 15:10:00',('2025-05-27 15:10:00' + INTERVAL 7 DAY),NULL,0,0.00,FALSE,'NONE',0.00,NULL),
+  ('192021222','BK006',23,6,'2025-05-28 10:00:00',('2025-05-28 10:00:00' + INTERVAL 7 DAY),NULL,0,0.00,FALSE,'NONE',0.00,NULL),
+  ('202122232','BK007',24,7,'2025-05-29 11:00:00',('2025-05-29 11:00:00' + INTERVAL 7 DAY),NULL,0,0.00,FALSE,'NONE',0.00,NULL),
+  ('212223242','BK008',25,8,'2025-05-30 12:00:00',('2025-05-30 12:00:00' + INTERVAL 7 DAY),NULL,0,0.00,FALSE,'NONE',0.00,NULL);
+-- Thêm 2 lượt mượn nữa cho đủ 30
+INSERT INTO `borrowing` (`identity_card`,`book_seri`,`reader_id`,`book_id`,`borrowed_at`,`due_date`,`returned_at`,`status`,`fine_amount`,`fine_paid`,`damage_status`,`damage_fine`,`notes`) VALUES
+  ('123456789','BK010',1,10,'2025-05-29 10:00:00',('2025-05-29 10:00:00' + INTERVAL 7 DAY),NULL,0,0.00,FALSE,'NONE',0.00,'Mượn thêm cuốn nữa.'),
+  ('987654321','BK011',2,11,'2025-05-30 11:00:00',('2025-05-30 11:00:00' + INTERVAL 7 DAY),'2025-05-31 10:00:00',1,0.00,TRUE,'MINOR',15000.00,'Trả sách, bìa hơi bẩn, đã vệ sinh.');
+
+
+-- 3.x book_reservation
+INSERT INTO `book_reservation` (`book_id`, `reader_id`, `reservation_date`, `expiry_date`, `status`) VALUES
+  (5, 1, '2025-05-28 10:00:00', ('2025-05-28 10:00:00' + INTERVAL 3 DAY), 'PENDING'), -- reader 1 đặt sách BK005 (AI)
+  (1, 3, '2025-05-29 11:00:00', ('2025-05-29 11:00:00' + INTERVAL 3 DAY), 'APPROVED'), -- reader 3 đặt sách BK001 (Lão Hạc)
+  (10, 2, '2025-05-20 14:00:00', ('2025-05-20 14:00:00' + INTERVAL 3 DAY), 'EXPIRED'), -- reader 2 đặt sách BK010, đã hết hạn
+  (7, 4, '2025-05-30 09:00:00', ('2025-05-30 09:00:00' + INTERVAL 3 DAY), 'PENDING');
+
+-- 3.x notification
+INSERT INTO `notification` (`reader_id`, `type`, `message`, `is_read`) VALUES
+  (1, 'RESERVATION_EXPIRING', 'Yêu cầu đặt sách "Trí Tuệ Nhân Tạo" của bạn sẽ hết hạn vào ngày mai.', FALSE),
+  (3, 'RESERVATION_APPROVED', 'Yêu cầu đặt sách "Lão Hạc" của bạn đã được chấp thuận. Vui lòng đến nhận sách trước ngày 2025-06-01.', FALSE),
+  (5, 'OVERDUE', 'Sách "Trí Tuệ Nhân Tạo" (BK005) bạn mượn đã quá hạn trả. Vui lòng trả sách sớm.', TRUE), -- reader_id 5, borrowing_id 8
+  (8, 'SYSTEM_MESSAGE', 'Tài khoản của bạn đã bị khóa do vi phạm quy định thư viện.', TRUE), -- reader_id 8
+  (2, 'DUE_DATE', 'Sách "Chiến Tranh Và Hòa Bình" (BK007) sẽ đến hạn trả vào ngày 2025-06-02.', FALSE); -- reader_id 2, borrowing_id 4
+
+-- 3.x fine_payment
+-- Giả sử borrowing_id = 5 (reader 3, sách BK003) có fine_amount là 10000, damage_fine 20000. Đã thanh toán.
+-- Giả sử borrowing_id = 15 (reader 12, sách BK015) có damage_fine 300000. Đã thanh toán.
+-- Giả sử borrowing_id = 17 (reader 14, sách BK017) có fine_amount 5000. Đã thanh toán.
+INSERT INTO `fine_payment` (`borrowing_id`, `amount`, `payment_date`, `payment_method`, `status`, `notes`) VALUES
+  (5, 30000.00, '2025-05-12 09:05:00', 'CASH', 'COMPLETED', 'Thanh toán tiền phạt trễ hạn và làm hỏng sách BK003.'),
+  (15, 300000.00, '2025-05-24 15:05:00', 'TRANSFER', 'COMPLETED', 'Thanh toán tiền đền sách BK015 bị mất.'),
+  (17, 5000.00, '2025-05-27 11:05:00', 'CARD', 'COMPLETED', 'Thanh toán tiền phạt trễ hạn sách BK017.');
+-- Giả sử borrowing_id = 13 (reader 10, sách BK013) có fine_amount 5000, fine_paid = FALSE
+INSERT INTO `fine_payment` (`borrowing_id`, `amount`, `payment_date`, `payment_method`, `status`, `notes`) VALUES
+  (13, 5000.00, '2025-05-31 17:00:00', 'CASH', 'PENDING', 'Ghi nhận khoản phạt trễ hạn sách BK013, chờ thanh toán.');
+
+
+-- 3.x book_location
+-- Gán vị trí cho một vài cuốn sách
+INSERT INTO `book_location` (`book_id`, `shelf_number`, `row_number`, `position`, `notes`) VALUES
+  (1, 'A1', 'R2', 'P5', 'Kệ Văn học Việt Nam'),
+  (2, 'B3', 'R1', 'P2', 'Kệ Khoa học Phổ thông'),
+  (3, 'C2', 'R4', 'P1', 'Kệ Lịch sử Việt Nam'),
+  (4, 'D1', 'R1', 'P10', 'Kệ Kinh tế học'),
+  (5, 'E5', 'R3', 'P7', 'Kệ Công nghệ thông tin - AI'),
+  (6, 'A1', 'R2', 'P6', NULL),
+  (7, 'A2', 'R1', 'P3', 'Kệ Văn học Nước ngoài'),
+  (10, 'E5', 'R2', 'P3', 'Kệ Công nghệ thông tin - Lập trình');
+
+
+-- 3.5 user (Cập nhật và thêm trường mới)
+INSERT INTO `user` (`username`,`password`,`email`,`role`,`last_login`) VALUES
+  ('admin','admin123','admin@library.com','admin', NOW()), -- Nên hash mật khẩu này
+  ('staff1','staff123','staff1@library.com','staff', NOW()),
+  ('staff2','staff456','staff2@library.com','staff', NULL),
+  ('staff3','staff789','staff3@library.com','staff', '2025-05-20 10:00:00'),
+  ('staff4','staff101','staff4@library.com','staff', NULL),
+  ('staff5','staff202','staff5@library.com','staff', '2025-05-28 15:30:00');
+
+-- Cập nhật reader_id và book_id cho bảng borrowing dựa trên identity_card và book_seri
+-- Chạy sau khi đã insert dữ liệu vào reader và book
+UPDATE `borrowing` br
+JOIN `reader` r ON br.identity_card = r.identity_card
+SET br.reader_id = r.id;
+
+UPDATE `borrowing` br
+JOIN `book` b ON br.book_seri = b.book_seri
+SET br.book_id = b.id;
+
+COMMIT;
