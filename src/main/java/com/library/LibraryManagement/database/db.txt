@@ -199,7 +199,6 @@ CREATE TABLE `user` (
   `email` VARCHAR(250) UNIQUE,
   `role` ENUM('admin','staff') NOT NULL DEFAULT 'staff',
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  `last_login` TIMESTAMP NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -406,13 +405,13 @@ INSERT INTO `book_location` (`book_id`, `shelf_number`, `row_number`, `position`
 
 
 -- 3.5 user (Cập nhật và thêm trường mới)
-INSERT INTO `user` (`username`,`password`,`email`,`role`,`last_login`) VALUES
-  ('admin','admin123','admin@library.com','admin', NOW()), -- Nên hash mật khẩu này
-  ('staff1','staff123','staff1@library.com','staff', NOW()),
-  ('staff2','staff456','staff2@library.com','staff', NULL),
-  ('staff3','staff789','staff3@library.com','staff', '2025-05-20 10:00:00'),
-  ('staff4','staff101','staff4@library.com','staff', NULL),
-  ('staff5','staff202','staff5@library.com','staff', '2025-05-28 15:30:00');
+INSERT INTO `user` (`username`,`password`,`email`,`role`) VALUES
+  ('admin','$2a$12$oRr.cMNDkVhAWZ4kkKtLEOaWpXxTZmuqoxML5gF8Ojh0qU.AkIAqG','admin@library.com','admin'), -- Nên hash mật khẩu này
+  ('staff1','$2a$12$oRr.cMNDkVhAWZ4kkKtLEOaWpXxTZmuqoxML5gF8Ojh0qU.AkIAqG','staff1@library.com','staff'),
+  ('staff2','$2a$12$oRr.cMNDkVhAWZ4kkKtLEOaWpXxTZmuqoxML5gF8Ojh0qU.AkIAqG','staff2@library.com','staff'),
+  ('staff3','$2a$12$oRr.cMNDkVhAWZ4kkKtLEOaWpXxTZmuqoxML5gF8Ojh0qU.AkIAqG','staff3@library.com','staff'),
+  ('staff4','$2a$12$oRr.cMNDkVhAWZ4kkKtLEOaWpXxTZmuqoxML5gF8Ojh0qU.AkIAqG','staff4@library.com','staff'),
+  ('staff5','$2a$12$oRr.cMNDkVhAWZ4kkKtLEOaWpXxTZmuqoxML5gF8Ojh0qU.AkIAqG','staff5@library.com','staff');
 
 -- Cập nhật reader_id và book_id cho bảng borrowing dựa trên identity_card và book_seri
 -- Chạy sau khi đã insert dữ liệu vào reader và book
