@@ -2,34 +2,33 @@ package com.library.LibraryManagement.entity;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 
-@Entity(name = "fine_payment")
+@Entity
+@Table(name = "fine_payment")
 public class FinePayment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(name = "borrowing_id", nullable = false)
-    private Borrowing borrowingId;
+    private Borrowing borrowing;
 
-    @Column(name = "amount", nullable = false, precision = 10, scale = 2)
+    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal amount;
 
     @Column(name = "payment_date")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date paymentDate;
+    private LocalDateTime paymentDate;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_method")
     private PaymentMethod paymentMethod;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status")
     private PaymentStatus status;
 
-    @Column(name = "notes", columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT")
     private String notes;
 
     public enum PaymentMethod {
@@ -43,27 +42,27 @@ public class FinePayment {
     @PrePersist
     protected void onCreate() {
         if (this.paymentDate == null) {
-            this.paymentDate = new Date();
+            this.paymentDate = LocalDateTime.now();
         }
         if (this.status == null) {
             this.status = PaymentStatus.PENDING;
         }
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public Borrowing getBorrowingId() {
-        return borrowingId;
+    public Borrowing getBorrowing() {
+        return borrowing;
     }
 
-    public void setBorrowingId(Borrowing borrowingId) {
-        this.borrowingId = borrowingId;
+    public void setBorrowing(Borrowing borrowing) {
+        this.borrowing = borrowing;
     }
 
     public BigDecimal getAmount() {
@@ -74,11 +73,11 @@ public class FinePayment {
         this.amount = amount;
     }
 
-    public Date getPaymentDate() {
+    public LocalDateTime getPaymentDate() {
         return paymentDate;
     }
 
-    public void setPaymentDate(Date paymentDate) {
+    public void setPaymentDate(LocalDateTime paymentDate) {
         this.paymentDate = paymentDate;
     }
 
@@ -105,4 +104,4 @@ public class FinePayment {
     public void setNotes(String notes) {
         this.notes = notes;
     }
-} 
+}

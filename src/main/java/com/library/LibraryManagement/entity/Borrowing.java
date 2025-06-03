@@ -56,7 +56,7 @@ public class Borrowing {
     @Column(name = "notes", columnDefinition = "TEXT")
     private String notes;
 
-    @OneToMany(mappedBy = "borrowingId")
+    @OneToMany(mappedBy = "borrowing")
     private Set<FinePayment> finePayments;
 
     public enum DamageStatus {
