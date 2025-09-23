@@ -24,7 +24,7 @@ A Spring Boot-based library management system that provides a robust backend for
 
 1. Clone the repository
 ```bash
-git clone [repository-url]
+git clone https://github.com/AndrewNguyenITVN/Library-Management-Springboot.git
 ```
 
 2. Configure MySQL database
