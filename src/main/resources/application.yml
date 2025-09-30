@@ -13,9 +13,20 @@ spring:
   servlet:
     multipart:
       max-file-size: 10MB
+  mail:
+    host: smtp.example.com
+    port: 587
+    username: your-email@example.com
+    password: your-email-password
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 jwt:
   privateKey: Wyu0XaLHFb5ZiCMtiecEn8yC77FZ67xiCBFlvSSB+bU=
 
 FileUpload:
-  rootPath: D:\New folder
+  rootPath: C:\Users\Admin\MyWork

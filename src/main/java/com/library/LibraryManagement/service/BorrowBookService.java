@@ -18,6 +18,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+import com.library.LibraryManagement.service.EmailService;
 
 @Service
 public class BorrowBookService implements BorrowBookServiceImp {
@@ -29,6 +30,9 @@ public class BorrowBookService implements BorrowBookServiceImp {
 
     @Autowired
     private BookRepository bookRepository;
+
+    @Autowired
+    private EmailService emailService;
 
     @Override
     public Boolean borrowBook(String identityCard, String bookSeri, String notes) {
@@ -75,7 +79,8 @@ public class BorrowBookService implements BorrowBookServiceImp {
             reader.setTotalBorrowed(reader.getTotalBorrowed() + 1);
             readerRepository.save(reader);
 
-            borrowingRepository.save(borrowing);
+            Borrowing savedBorrowing = borrowingRepository.save(borrowing);
+            emailService.sendBorrowingConfirmationEmail(savedBorrowing);
             return true;
         } catch (Exception e) {
             System.err.println("Lỗi khi mượn sách: " + e.getMessage());
