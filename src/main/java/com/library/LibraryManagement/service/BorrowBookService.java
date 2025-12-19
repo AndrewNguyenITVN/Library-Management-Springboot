@@ -151,7 +151,7 @@ public class BorrowBookService implements BorrowBookServiceImp {
     @Override
     public List<BorrowingDTO> getOverdueBorrowings() {
         Date today = new Date();
-        List<Borrowing> overdue = borrowingRepository.findByDueDateBeforeAndStatusFalse(today);
+        List<Borrowing> overdue = borrowingRepository.findByDueDateBeforeAndStatus(today, 0);
         return overdue.stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
