@@ -2,7 +2,7 @@ package com.library.LibraryManagement.controller;
 
 import com.library.LibraryManagement.entity.User.Role;
 import com.library.LibraryManagement.payload.ResponseData;
-import com.library.LibraryManagement.service.imp.LoginServiceImp;
+import com.library.LibraryManagement.service.LoginService;
 import com.library.LibraryManagement.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 public class LoginController {
 
     @Autowired
-    LoginServiceImp loginServiceImp;
+    LoginService loginService;
 
     @Autowired
     JwtUtils jwtUtils;
@@ -54,7 +54,7 @@ public class LoginController {
             @RequestParam String role) {
         ResponseData responseData = new ResponseData();
 
-        if (loginServiceImp.createUser(username, password, email, role)) {
+        if (loginService.createUser(username, password, email, role)) {
             responseData.setData("");
             responseData.setSuccess(true);
         } else {
