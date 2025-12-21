@@ -2,7 +2,7 @@ package com.library.LibraryManagement.controller;
 
 import com.library.LibraryManagement.dto.CategoryDTO;
 import com.library.LibraryManagement.payload.ResponseData;
-import com.library.LibraryManagement.service.imp.CategoryServiceImp;
+import com.library.LibraryManagement.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,12 +15,12 @@ import java.util.List;
 @RequestMapping("/category")
 public class CategptyController {
     @Autowired
-    CategoryServiceImp  categoryServiceImp;
+    CategoryService categoryService;
 
     @PostMapping("/insert-category")
     public ResponseEntity<?> insertCategory(@RequestParam String categoryName) {
         ResponseData responseData = new ResponseData();
-        boolean success = categoryServiceImp.createCategory(categoryName);
+        boolean success = categoryService.createCategory(categoryName);
         responseData.setSuccess(success);
         responseData.setDesc(success
                 ? "Thêm danh mục thành công"
@@ -34,7 +34,7 @@ public class CategptyController {
             @RequestParam int id,
             @RequestParam String categoryName) {
         ResponseData responseData = new ResponseData();
-        boolean success = categoryServiceImp.updateCategory(id, categoryName);
+        boolean success = categoryService.updateCategory(id, categoryName);
         responseData.setSuccess(success);
         responseData.setDesc(success
                 ? "Cập nhật danh mục thành công"
@@ -47,7 +47,7 @@ public class CategptyController {
     @GetMapping("/get-all-categories")
     public ResponseEntity<?> getAllCategories() {
         ResponseData responseData = new ResponseData();
-        List<CategoryDTO> list = categoryServiceImp.getAllCategories();
+        List<CategoryDTO> list = categoryService.getAllCategories();
         responseData.setSuccess(true);
         responseData.setDesc("Lấy danh sách danh mục thành công");
         responseData.setData(list);
