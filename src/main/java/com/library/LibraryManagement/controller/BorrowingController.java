@@ -3,7 +3,7 @@ package com.library.LibraryManagement.controller;
 import com.library.LibraryManagement.dto.BorrowingDTO;
 import com.library.LibraryManagement.entity.Borrowing.DamageStatus;
 import com.library.LibraryManagement.payload.ResponseData;
-import com.library.LibraryManagement.service.imp.BorrowBookServiceImp;
+import com.library.LibraryManagement.service.BorrowBookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +20,7 @@ import java.util.Map;
 @RequestMapping("/borrowing")
 public class BorrowingController {
     @Autowired
-    private BorrowBookServiceImp borrowBookServiceImp;
+    private BorrowBookService borrowBookService;
 
     @PostMapping("/borrow")
     public ResponseEntity<?> borrowBook(@RequestParam String identityCard,
@@ -28,7 +28,7 @@ public class BorrowingController {
                                       @RequestParam(required = false) String notes) {
         ResponseData resp = new ResponseData();
         try {
-            Boolean isSuccess = borrowBookServiceImp.borrowBook(identityCard, bookSeri, notes);
+            Boolean isSuccess = borrowBookService.borrowBook(identityCard, bookSeri, notes);
             resp.setSuccess(true);
             resp.setData(isSuccess);
             resp.setDesc("Mượn sách thành công");
@@ -46,7 +46,7 @@ public class BorrowingController {
                                       @RequestParam(required = false) String notes) {
         ResponseData resp = new ResponseData();
         try {
-            Boolean isSuccess = borrowBookServiceImp.returnBook(borrowingId, damageStatus, damageFine, notes);
+            Boolean isSuccess = borrowBookService.returnBook(borrowingId, damageStatus, damageFine, notes);
             resp.setSuccess(true);
             resp.setData(isSuccess);
             resp.setDesc("Trả sách thành công");
@@ -60,7 +60,7 @@ public class BorrowingController {
     @GetMapping("/all")
     public ResponseEntity<?> getAll() {
         ResponseData resp = new ResponseData();
-        List<BorrowingDTO> list = borrowBookServiceImp.getAllBorrowings();
+        List<BorrowingDTO> list = borrowBookService.getAllBorrowings();
         resp.setSuccess(true);
         resp.setData(list);
         resp.setDesc("Danh sách mượn trả");
@@ -70,7 +70,7 @@ public class BorrowingController {
     @GetMapping("/by-reader")
     public ResponseEntity<?> getBorrowingsByIdentityCard(@RequestParam String identityCard) {
         ResponseData resp = new ResponseData();
-        List<BorrowingDTO> list = borrowBookServiceImp.getBorrowingsByIdentityCard(identityCard);
+        List<BorrowingDTO> list = borrowBookService.getBorrowingsByIdentityCard(identityCard);
         resp.setSuccess(true);
         resp.setData(list);
         resp.setDesc("Danh sách mượn trả của độc giả");
@@ -80,7 +80,7 @@ public class BorrowingController {
     @GetMapping("/overdue")
     public ResponseEntity<?> getOverdueBorrowings() {
         ResponseData resp = new ResponseData();
-        List<BorrowingDTO> list = borrowBookServiceImp.getOverdueBorrowings();
+        List<BorrowingDTO> list = borrowBookService.getOverdueBorrowings();
         resp.setSuccess(true);
         resp.setData(list);
         resp.setDesc("Danh sách mượn quá hạn");
@@ -106,11 +106,11 @@ public class BorrowingController {
         long count;
         List<BorrowingDTO> list;
         if ("week".equalsIgnoreCase(type)) {
-            count = borrowBookServiceImp.countBorrowingsInWeek(year, week);
-            list = borrowBookServiceImp.getBorrowingsInWeek(year, week);
+            count = borrowBookService.countBorrowingsInWeek(year, week);
+            list = borrowBookService.getBorrowingsInWeek(year, week);
         } else if ("month".equalsIgnoreCase(type)) {
-            count = borrowBookServiceImp.countBorrowingsInMonth(year, month);
-            list = borrowBookServiceImp.getBorrowingsInMonth(year, month);
+            count = borrowBookService.countBorrowingsInMonth(year, month);
+            list = borrowBookService.getBorrowingsInMonth(year, month);
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Invalid type, must be 'week' or 'month'");
@@ -137,7 +137,7 @@ public class BorrowingController {
                                    @RequestParam(required = false) String notes) {
         ResponseData resp = new ResponseData();
         try {
-            Boolean isSuccess = borrowBookServiceImp.payFine(borrowingId, amount, notes);
+            Boolean isSuccess = borrowBookService.payFine(borrowingId, amount, notes);
             resp.setSuccess(true);
             resp.setData(isSuccess);
             resp.setDesc("Thanh toán tiền phạt thành công");
