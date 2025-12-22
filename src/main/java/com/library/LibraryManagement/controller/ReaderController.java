@@ -4,7 +4,7 @@ import com.library.LibraryManagement.dto.ReaderDTO;
 import com.library.LibraryManagement.entity.Reader.CardType;
 import com.library.LibraryManagement.entity.Reader.ReaderStatus;
 import com.library.LibraryManagement.payload.ResponseData;
-import com.library.LibraryManagement.service.imp.ReaderServiceImp;
+import com.library.LibraryManagement.service.ReaderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +17,7 @@ import java.util.List;
 @RequestMapping("/reader")
 public class ReaderController {
     @Autowired
-    ReaderServiceImp readerServiceImp;
+    ReaderService readerService;
 
     @PostMapping("/insert-reader")
     public ResponseEntity<?> insertReader(@RequestParam String nameReader,
@@ -29,7 +29,7 @@ public class ReaderController {
                                         @RequestParam(required = false) CardType cardType,
                                         @RequestParam(required = false) String cardExpiryDate) {
         ResponseData responseData = new ResponseData();
-        boolean success = readerServiceImp.insertReader(nameReader, identityCard, phone, email, address,
+        boolean success = readerService.insertReader(nameReader, identityCard, phone, email, address,
                 dateOfBirth, cardType, cardExpiryDate);
         responseData.setSuccess(true);
         responseData.setData(success);
@@ -41,14 +41,14 @@ public class ReaderController {
         ResponseData responseData = new ResponseData();
         responseData.setSuccess(true);
         responseData.setDesc("Lấy danh sách người đọc thành công");
-        responseData.setData(readerServiceImp.getAllReaders());
+        responseData.setData(readerService.getAllReaders());
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
     @GetMapping("/search")
     public ResponseEntity<?> searchReader(@RequestParam String nameReader) {
         ResponseData responseData = new ResponseData();
-        responseData.setData(readerServiceImp.searchReaderByName(nameReader));
+        responseData.setData(readerService.searchReaderByName(nameReader));
         responseData.setSuccess(true);
         responseData.setDesc("Lấy danh sách người đọc thành công");
         return new ResponseEntity<>(responseData, HttpStatus.OK);
@@ -57,7 +57,7 @@ public class ReaderController {
     @GetMapping("/search-by-idcard")
     public ResponseEntity<?> searchByIdentityCard(@RequestParam String identityCard) {
         ResponseData responseData = new ResponseData();
-        responseData.setData(readerServiceImp.searchReaderByIdentityCard(identityCard));
+        responseData.setData(readerService.searchReaderByIdentityCard(identityCard));
         responseData.setSuccess(true);
         responseData.setDesc("Tìm danh sách người đọc thành công");
         return new ResponseEntity<>(responseData, HttpStatus.OK);
@@ -74,7 +74,7 @@ public class ReaderController {
                                         @RequestParam(required = false) String cardExpiryDate,
                                         @RequestParam(required = false) ReaderStatus status) {
         ResponseData responseData = new ResponseData();
-        boolean success = readerServiceImp.updateReader(id, nameReader, phone, email, address,
+        boolean success = readerService.updateReader(id, nameReader, phone, email, address,
                 dateOfBirth, cardType, cardExpiryDate, status);
         responseData.setSuccess(success);
         responseData.setData(success);
@@ -82,4 +82,3 @@ public class ReaderController {
     }
 
 }
-
