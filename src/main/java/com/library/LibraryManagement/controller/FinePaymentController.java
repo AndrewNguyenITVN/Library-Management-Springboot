@@ -3,7 +3,7 @@ package com.library.LibraryManagement.controller;
 import com.library.LibraryManagement.dto.FinePaymentDTO;
 import com.library.LibraryManagement.entity.FinePayment;
 import com.library.LibraryManagement.payload.ResponseData;
-import com.library.LibraryManagement.service.imp.FinePaymentServiceImp;
+import com.library.LibraryManagement.service.FinePaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +16,7 @@ import java.util.List;
 @RequestMapping("/fine-payment")
 public class FinePaymentController {
     @Autowired
-    private FinePaymentServiceImp finePaymentService;
+    private FinePaymentService finePaymentService;
 
     @GetMapping("/all")
     public ResponseEntity<?> getAllPayments() {
@@ -100,4 +100,4 @@ public class FinePaymentController {
         responseData.setDesc(success ? "Xóa thanh toán thành công" : "Xóa thanh toán thất bại");
         return new ResponseEntity<>(responseData, success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
     }
-} 
+}
