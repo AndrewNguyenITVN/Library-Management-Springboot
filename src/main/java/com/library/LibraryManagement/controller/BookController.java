@@ -2,8 +2,8 @@ package com.library.LibraryManagement.controller;
 
 import com.library.LibraryManagement.dto.BookDTO;
 import com.library.LibraryManagement.payload.ResponseData;
-import com.library.LibraryManagement.service.imp.BookServiceImp;
-import com.library.LibraryManagement.service.imp.FileServiceImp;
+import com.library.LibraryManagement.service.BookService;
+import com.library.LibraryManagement.service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,17 +17,17 @@ import java.util.List;
 @RequestMapping("/book")
 public final class BookController {
     @Autowired
-    FileServiceImp fileServiceImp;
+    FileService fileService;
 
     @Autowired
-    BookServiceImp bookServiceImp;
+    BookService bookService;
 
     @GetMapping("/show-all-books")
     public ResponseEntity<?> showListOfBooks() {
         ResponseData responseData = new ResponseData();
         responseData.setSuccess(true);
         responseData.setDesc("Lấy danh sách sách thành công");
-        responseData.setData(bookServiceImp.getAllBook());
+        responseData.setData(bookService.getAllBook());
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
@@ -46,7 +46,7 @@ public final class BookController {
                                     @RequestParam(required = false) String edition,
                                     @RequestParam(required = false) Integer pageCount) {
         ResponseData responseData = new ResponseData();
-        boolean isSuccess = bookServiceImp.addBook(file, bookSeri, nameBook, categoryId, stockQuantity,
+        boolean isSuccess = bookService.addBook(file, bookSeri, nameBook, categoryId, stockQuantity,
                 author, publisher, publishYear, isbn, description, language, edition, pageCount);
         responseData.setData(isSuccess);
         return new ResponseEntity<>(responseData, HttpStatus.OK);
@@ -55,7 +55,7 @@ public final class BookController {
     @PostMapping("/delete-book")
     public ResponseEntity<?> deleteBookFromList(@RequestParam int id) {
         ResponseData responseData = new ResponseData();
-        boolean isSuccess = bookServiceImp.delBook(id);
+        boolean isSuccess = bookService.delBook(id);
         responseData.setData(isSuccess);
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
@@ -75,7 +75,7 @@ public final class BookController {
                                       @RequestParam(required = false) String language,
                                       @RequestParam(required = false) String edition,
                                       @RequestParam(required = false) Integer pageCount) {
-        boolean isSuccess = bookServiceImp.editBook(id, file, bookSeri, nameBook, stockQuantity, categoryId,
+        boolean isSuccess = bookService.editBook(id, file, bookSeri, nameBook, stockQuantity, categoryId,
                 author, publisher, publishYear, isbn, description, language, edition, pageCount);
         ResponseData responseData = new ResponseData();
         if (isSuccess) {
@@ -91,7 +91,7 @@ public final class BookController {
     public ResponseEntity<?> searchBooks(@RequestParam String bookName) {
         ResponseData responseData = new ResponseData();
         try {
-            List<BookDTO> result = bookServiceImp.searchBook(bookName);
+            List<BookDTO> result = bookService.searchBook(bookName);
             responseData.setData(result);
             responseData.setSuccess(true);
         } catch (Exception e) {
@@ -104,7 +104,7 @@ public final class BookController {
     public ResponseEntity<?> searchBookByBookSeri(@RequestParam String bookSeri) {
         ResponseData responseData = new ResponseData();
         try {
-            BookDTO result = bookServiceImp.searchBookByBookSeri(bookSeri);
+            BookDTO result = bookService.searchBookByBookSeri(bookSeri);
             responseData.setData(result);
             responseData.setSuccess(true);
         } catch (Exception e) {
