@@ -3,6 +3,7 @@ package com.library.LibraryManagement.service.impl;
 import com.library.LibraryManagement.dto.BookDTO;
 import com.library.LibraryManagement.entity.Book;
 import com.library.LibraryManagement.entity.Category;
+import com.library.LibraryManagement.mapper.BookMapper;
 import com.library.LibraryManagement.repository.BookRepository;
 import com.library.LibraryManagement.service.BookService;
 import com.library.LibraryManagement.service.FileService;
@@ -22,31 +23,15 @@ public class BookServiceImpl implements BookService {
     @Autowired
     FileService fileService;
 
+    @Autowired
+    BookMapper bookMapper;
+
     @Override
     public List<BookDTO> getAllBook() {
         List<Book> bookList = bookRepository.findAll();
         List<BookDTO> bookDTOList = new ArrayList<>();
         for (Book book : bookList) {
-            BookDTO bookDTO = new BookDTO();
-            bookDTO.setId(book.getId());
-            bookDTO.setBookSeri(book.getBookSeri());
-            bookDTO.setNameBook(book.getNameBook());
-            bookDTO.setCategoryId(book.getCategoryId().getId());
-            bookDTO.setCategoryName(book.getCategoryId().getNameCate());
-            bookDTO.setStockQuantity(book.getStockQuantity());
-            bookDTO.setImageUrl(book.getImageUrl());
-            bookDTO.setAuthor(book.getAuthor());
-            bookDTO.setPublisher(book.getPublisher());
-            bookDTO.setPublishYear(book.getPublishYear());
-            bookDTO.setIsbn(book.getIsbn());
-            bookDTO.setDescription(book.getDescription());
-            bookDTO.setLanguage(book.getLanguage());
-            bookDTO.setEdition(book.getEdition());
-            bookDTO.setPageCount(book.getPageCount());
-            bookDTO.setRating(book.getRating());
-            bookDTO.setTotalRatings(book.getTotalRatings());
-            bookDTO.setCreatedAt(book.getCreatedAt());
-            bookDTOList.add(bookDTO);
+            bookDTOList.add(bookMapper.toDTO(book));
         }
         return bookDTOList;
     }
@@ -144,26 +129,7 @@ public class BookServiceImpl implements BookService {
         List<BookDTO> bookDTOList = new ArrayList<>();
 
         for (Book book : bookList) {
-            BookDTO bookDTO = new BookDTO();
-            bookDTO.setId(book.getId());
-            bookDTO.setBookSeri(book.getBookSeri());
-            bookDTO.setNameBook(book.getNameBook());
-            bookDTO.setCategoryId(book.getCategoryId().getId());
-            bookDTO.setCategoryName(book.getCategoryId().getNameCate());
-            bookDTO.setStockQuantity(book.getStockQuantity());
-            bookDTO.setImageUrl(book.getImageUrl());
-            bookDTO.setAuthor(book.getAuthor());
-            bookDTO.setPublisher(book.getPublisher());
-            bookDTO.setPublishYear(book.getPublishYear());
-            bookDTO.setIsbn(book.getIsbn());
-            bookDTO.setDescription(book.getDescription());
-            bookDTO.setLanguage(book.getLanguage());
-            bookDTO.setEdition(book.getEdition());
-            bookDTO.setPageCount(book.getPageCount());
-            bookDTO.setRating(book.getRating());
-            bookDTO.setTotalRatings(book.getTotalRatings());
-            bookDTO.setCreatedAt(book.getCreatedAt());
-            bookDTOList.add(bookDTO);
+            bookDTOList.add(bookMapper.toDTO(book));
         }
         return bookDTOList;
     }
@@ -171,28 +137,6 @@ public class BookServiceImpl implements BookService {
     @Override
     public BookDTO searchBookByBookSeri(String bookSeri) {
         Book book = bookRepository.findByBookSeri(bookSeri);
-        BookDTO bookDTO = new BookDTO();
-
-        bookDTO.setId(book.getId());
-        bookDTO.setBookSeri(book.getBookSeri());
-        bookDTO.setNameBook(book.getNameBook());
-        bookDTO.setCategoryId(book.getCategoryId().getId());
-        bookDTO.setCategoryName(book.getCategoryId().getNameCate());
-        bookDTO.setStockQuantity(book.getStockQuantity());
-        bookDTO.setImageUrl(book.getImageUrl());
-        bookDTO.setAuthor(book.getAuthor());
-        bookDTO.setPublisher(book.getPublisher());
-        bookDTO.setPublishYear(book.getPublishYear());
-        bookDTO.setIsbn(book.getIsbn());
-        bookDTO.setDescription(book.getDescription());
-        bookDTO.setLanguage(book.getLanguage());
-        bookDTO.setEdition(book.getEdition());
-        bookDTO.setPageCount(book.getPageCount());
-        bookDTO.setRating(book.getRating());
-        bookDTO.setTotalRatings(book.getTotalRatings());
-        bookDTO.setCreatedAt(book.getCreatedAt());
-
-        return bookDTO;
+        return bookMapper.toDTO(book);
     }
 }
-
