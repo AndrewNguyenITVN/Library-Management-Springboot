@@ -5,6 +5,7 @@ import com.library.LibraryManagement.entity.Book;
 import com.library.LibraryManagement.entity.Borrowing;
 import com.library.LibraryManagement.entity.Borrowing.DamageStatus;
 import com.library.LibraryManagement.entity.Reader;
+import com.library.LibraryManagement.mapper.BorrowingMapper;
 import com.library.LibraryManagement.repository.BookRepository;
 import com.library.LibraryManagement.repository.BorrowingRepository;
 import com.library.LibraryManagement.repository.ReaderRepository;
@@ -32,6 +33,9 @@ public class BorrowBookServiceImpl implements BorrowBookService {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private BorrowingMapper borrowingMapper;
 
     @Override
     public Boolean borrowBook(String identityCard, String bookSeri, String notes) {
@@ -135,7 +139,7 @@ public class BorrowBookServiceImpl implements BorrowBookService {
     public List<BorrowingDTO> getAllBorrowings() {
         List<Borrowing> borrowingList = borrowingRepository.findAll();
         return borrowingList.stream()
-                .map(this::toDTO)
+                .map(borrowingMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
@@ -143,7 +147,7 @@ public class BorrowBookServiceImpl implements BorrowBookService {
     public List<BorrowingDTO> getBorrowingsByIdentityCard(String identityCard) {
         List<Borrowing> borrowingList = borrowingRepository.findByIdentityCard(identityCard);
         return borrowingList.stream()
-                .map(this::toDTO)
+                .map(borrowingMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
@@ -152,7 +156,7 @@ public class BorrowBookServiceImpl implements BorrowBookService {
         Date today = new Date();
         List<Borrowing> overdue = borrowingRepository.findByDueDateBeforeAndStatus(today, 0);
         return overdue.stream()
-                .map(this::toDTO)
+                .map(borrowingMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
@@ -176,7 +180,7 @@ public class BorrowBookServiceImpl implements BorrowBookService {
         Date weekEnd = getWeekEnd(weekStart);
         return borrowingRepository.findByBorrowedAtBetween(weekStart, weekEnd)
                 .stream()
-                .map(this::toDTO)
+                .map(borrowingMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
@@ -186,7 +190,7 @@ public class BorrowBookServiceImpl implements BorrowBookService {
         Date monthEnd = getMonthEnd(monthStart);
         return borrowingRepository.findByBorrowedAtBetween(monthStart, monthEnd)
                 .stream()
-                .map(this::toDTO)
+                .map(borrowingMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
@@ -212,26 +216,6 @@ public class BorrowBookServiceImpl implements BorrowBookService {
             System.err.println("Lỗi khi thanh toán tiền phạt: " + e.getMessage());
             return false;
         }
-    }
-
-    private BorrowingDTO toDTO(Borrowing b) {
-        BorrowingDTO dto = new BorrowingDTO();
-        dto.setId(b.getId());
-        dto.setReaderName(b.getIdentityCard());
-        dto.setIdentityCard(b.getIdentityCard());
-        dto.setPhone(b.getIdentityCard());
-        dto.setBookSeri(b.getBookSeri());
-        dto.setBookName(b.getBookSeri());
-        dto.setBorrowedAt(b.getBorrowedAt());
-        dto.setReturnedAt(b.getReturnedAt());
-        dto.setDueDate(b.getDueDate());
-        dto.setStatus(b.getStatus());
-        dto.setFineAmount(b.getFineAmount());
-        dto.setFinePaid(b.getFinePaid());
-        dto.setDamageStatus(b.getDamageStatus());
-        dto.setDamageFine(b.getDamageFine());
-        dto.setNotes(b.getNotes());
-        return dto;
     }
 
     private Date getWeekStart(int year, int week) {
@@ -286,4 +270,3 @@ public class BorrowBookServiceImpl implements BorrowBookService {
         cal.set(Calendar.MILLISECOND, 999);
     }
 }
-
