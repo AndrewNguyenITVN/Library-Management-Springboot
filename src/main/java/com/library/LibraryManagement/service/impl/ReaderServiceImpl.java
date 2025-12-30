@@ -4,6 +4,7 @@ import com.library.LibraryManagement.dto.ReaderDTO;
 import com.library.LibraryManagement.entity.Reader;
 import com.library.LibraryManagement.entity.Reader.CardType;
 import com.library.LibraryManagement.entity.Reader.ReaderStatus;
+import com.library.LibraryManagement.mapper.ReaderMapper;
 import com.library.LibraryManagement.repository.ReaderRepository;
 import com.library.LibraryManagement.service.ReaderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,11 +13,15 @@ import org.springframework.stereotype.Service;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ReaderServiceImpl implements ReaderService {
     @Autowired
     private ReaderRepository readerRepository;
+
+    @Autowired
+    private ReaderMapper readerMapper;
 
     @Override
     public boolean insertReader(String fullName, String idCard, String phone, String email, String address,
@@ -58,73 +63,23 @@ public class ReaderServiceImpl implements ReaderService {
     @Override
     public List<ReaderDTO> getAllReaders() {
         List<Reader> readerList = readerRepository.findAll();
-        List<ReaderDTO> readerDTOList = new ArrayList<>();
-
-        for (Reader reader : readerList) {
-            ReaderDTO dto = new ReaderDTO();
-            dto.setId(reader.getId());
-            dto.setNameReader(reader.getNameReader());
-            dto.setIdentityCard(reader.getIdentityCard());
-            dto.setPhone(reader.getPhone());
-            dto.setEmail(reader.getEmail());
-            dto.setAddress(reader.getAddress());
-            dto.setDateOfBirth(reader.getDateOfBirth());
-            dto.setCardType(reader.getCardType());
-            dto.setCardExpiryDate(reader.getCardExpiryDate());
-            dto.setTotalBorrowed(reader.getTotalBorrowed());
-            dto.setTotalOverdue(reader.getTotalOverdue());
-            dto.setStatus(reader.getStatus());
-            dto.setCreatedAt(reader.getCreatedAt());
-            readerDTOList.add(dto);
-        }
-
-        return readerDTOList;
+        return readerList.stream()
+                .map(readerMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<ReaderDTO> searchReaderByName(String name) {
         List<Reader> readers = readerRepository.findByNameReaderContainingIgnoreCase(name);
-        List<ReaderDTO> result = new ArrayList<>();
-
-        for (Reader reader : readers) {
-            ReaderDTO dto = new ReaderDTO();
-            dto.setId(reader.getId());
-            dto.setNameReader(reader.getNameReader());
-            dto.setIdentityCard(reader.getIdentityCard());
-            dto.setPhone(reader.getPhone());
-            dto.setEmail(reader.getEmail());
-            dto.setAddress(reader.getAddress());
-            dto.setDateOfBirth(reader.getDateOfBirth());
-            dto.setCardType(reader.getCardType());
-            dto.setCardExpiryDate(reader.getCardExpiryDate());
-            dto.setTotalBorrowed(reader.getTotalBorrowed());
-            dto.setTotalOverdue(reader.getTotalOverdue());
-            dto.setStatus(reader.getStatus());
-            dto.setCreatedAt(reader.getCreatedAt());
-            result.add(dto);
-        }
-
-        return result;
+        return readers.stream()
+                .map(readerMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
     public ReaderDTO searchReaderByIdentityCard(String identityCard) {
         Reader reader = readerRepository.findByIdentityCard(identityCard);
-        ReaderDTO result = new ReaderDTO();
-        result.setId(reader.getId());
-        result.setNameReader(reader.getNameReader());
-        result.setIdentityCard(reader.getIdentityCard());
-        result.setPhone(reader.getPhone());
-        result.setEmail(reader.getEmail());
-        result.setAddress(reader.getAddress());
-        result.setDateOfBirth(reader.getDateOfBirth());
-        result.setCardType(reader.getCardType());
-        result.setCardExpiryDate(reader.getCardExpiryDate());
-        result.setTotalBorrowed(reader.getTotalBorrowed());
-        result.setTotalOverdue(reader.getTotalOverdue());
-        result.setStatus(reader.getStatus());
-        result.setCreatedAt(reader.getCreatedAt());
-        return result;
+        return readerMapper.toDTO(reader);
     }
 
     @Override
@@ -158,4 +113,3 @@ public class ReaderServiceImpl implements ReaderService {
     }
 
 }
-
