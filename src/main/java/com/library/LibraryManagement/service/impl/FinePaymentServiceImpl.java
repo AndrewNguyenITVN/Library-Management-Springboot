@@ -3,6 +3,7 @@ package com.library.LibraryManagement.service.impl;
 import com.library.LibraryManagement.dto.FinePaymentDTO;
 import com.library.LibraryManagement.entity.Borrowing;
 import com.library.LibraryManagement.entity.FinePayment;
+import com.library.LibraryManagement.mapper.FinePaymentMapper;
 import com.library.LibraryManagement.repository.BorrowingRepository;
 import com.library.LibraryManagement.repository.FinePaymentRepository;
 import com.library.LibraryManagement.service.FinePaymentService;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class FinePaymentServiceImpl implements FinePaymentService {
@@ -21,6 +23,9 @@ public class FinePaymentServiceImpl implements FinePaymentService {
 
     @Autowired
     private BorrowingRepository borrowingRepository;
+
+    @Autowired
+    private FinePaymentMapper finePaymentMapper;
 
     @Override
     public List<FinePaymentDTO> getAllPayments() {
@@ -31,7 +36,7 @@ public class FinePaymentServiceImpl implements FinePaymentService {
     @Override
     public FinePaymentDTO getPaymentById(Integer id) {
         Optional<FinePayment> payment = finePaymentRepository.findById(id);
-        return payment.map(this::convertToDTO).orElse(null);
+        return payment.map(finePaymentMapper::toDTO).orElse(null);
     }
 
     @Override
@@ -123,29 +128,9 @@ public class FinePaymentServiceImpl implements FinePaymentService {
         }
     }
 
-    private FinePaymentDTO convertToDTO(FinePayment payment) {
-        FinePaymentDTO dto = new FinePaymentDTO();
-        dto.setId(payment.getId());
-        dto.setBorrowingId(payment.getBorrowing().getId());
-        dto.setAmount(payment.getAmount());
-        dto.setPaymentDate(payment.getPaymentDate());
-        dto.setPaymentMethod(payment.getPaymentMethod());
-        dto.setStatus(payment.getStatus());
-        dto.setNotes(payment.getNotes());
-        
-        // Set additional display fields
-        dto.setReaderName(payment.getBorrowing().getReaderId().getNameReader());
-        dto.setBookName(payment.getBorrowing().getBookId().getNameBook());
-        
-        return dto;
-    }
-
     private List<FinePaymentDTO> convertToDTOList(List<FinePayment> payments) {
-        List<FinePaymentDTO> dtoList = new ArrayList<>();
-        for (FinePayment payment : payments) {
-            dtoList.add(convertToDTO(payment));
-        }
-        return dtoList;
+        return payments.stream()
+                .map(finePaymentMapper::toDTO)
+                .collect(Collectors.toList());
     }
 }
-
