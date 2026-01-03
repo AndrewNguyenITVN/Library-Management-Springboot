@@ -1,30 +1,56 @@
 package com.library.LibraryManagement.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
 import java.math.BigDecimal;
 import java.util.Date;
 
 public class BookDTO {
     private int id;
+    
+    @NotBlank(message = "Book serial number cannot be blank")
     private String bookSeri;
+    
+    @NotBlank(message = "Book name cannot be blank")
     private String nameBook;
+    
+    @NotNull(message = "Category ID is required")
     private int categoryId;
+    
     private String categoryName;
+    
+    @Min(value = 0, message = "Stock quantity cannot be negative")
     private int stockQuantity;
+    
     private String imageUrl;
+    
+    @NotBlank(message = "Author cannot be blank")
     private String author;
+    
     private String publisher;
+    
     private Integer publishYear;
+    
     private String isbn;
+    
+    @Min(value = 0, message = "Price cannot be negative")
     private BigDecimal price;
+    
     private String description;
     private String language;
     private String edition;
+    
+    @Min(value = 1, message = "Page count must be at least 1")
     private Integer pageCount;
+    
     private BigDecimal rating;
     private Integer totalRatings;
     
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @PastOrPresent(message = "Created date cannot be in the future")
     private Date createdAt;
 
     // Getters and Setters
