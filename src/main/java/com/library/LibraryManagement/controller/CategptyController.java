@@ -3,9 +3,11 @@ package com.library.LibraryManagement.controller;
 import com.library.LibraryManagement.dto.CategoryDTO;
 import com.library.LibraryManagement.payload.ResponseData;
 import com.library.LibraryManagement.service.CategoryService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,14 +15,15 @@ import java.util.List;
 @RestController
 @CrossOrigin
 @RequestMapping("/category")
+@Validated
 public class CategptyController {
     @Autowired
     CategoryService categoryService;
 
     @PostMapping("/insert-category")
-    public ResponseEntity<?> insertCategory(@RequestParam String categoryName) {
+    public ResponseEntity<?> insertCategory(@Valid @RequestBody CategoryDTO categoryDTO) {
         ResponseData responseData = new ResponseData();
-        boolean success = categoryService.createCategory(categoryName);
+        boolean success = categoryService.createCategory(categoryDTO.getNameCate());
         responseData.setSuccess(success);
         responseData.setDesc(success
                 ? "Thêm danh mục thành công"
@@ -32,9 +35,9 @@ public class CategptyController {
     @PutMapping("/update-category")
     public ResponseEntity<?> updateCategory(
             @RequestParam int id,
-            @RequestParam String categoryName) {
+            @Valid @RequestBody CategoryDTO categoryDTO) {
         ResponseData responseData = new ResponseData();
-        boolean success = categoryService.updateCategory(id, categoryName);
+        boolean success = categoryService.updateCategory(id, categoryDTO.getNameCate());
         responseData.setSuccess(success);
         responseData.setDesc(success
                 ? "Cập nhật danh mục thành công"
