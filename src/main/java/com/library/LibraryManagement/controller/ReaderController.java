@@ -5,32 +5,35 @@ import com.library.LibraryManagement.entity.Reader.CardType;
 import com.library.LibraryManagement.entity.Reader.ReaderStatus;
 import com.library.LibraryManagement.payload.ResponseData;
 import com.library.LibraryManagement.service.ReaderService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 @RestController
 @CrossOrigin
 @RequestMapping("/reader")
+@Validated
 public class ReaderController {
     @Autowired
     ReaderService readerService;
 
     @PostMapping("/insert-reader")
-    public ResponseEntity<?> insertReader(@RequestParam String nameReader,
-                                        @RequestParam String identityCard,
-                                        @RequestParam String phone,
-                                        @RequestParam(required = false) String email,
-                                        @RequestParam(required = false) String address,
-                                        @RequestParam(required = false) String dateOfBirth,
-                                        @RequestParam(required = false) CardType cardType,
-                                        @RequestParam(required = false) String cardExpiryDate) {
+    public ResponseEntity<?> insertReader(@Valid @RequestBody ReaderDTO readerDTO) {
         ResponseData responseData = new ResponseData();
-        boolean success = readerService.insertReader(nameReader, identityCard, phone, email, address,
-                dateOfBirth, cardType, cardExpiryDate);
+        // Convert Date objects to Strings for service compatibility if needed, or update service to accept DTO/Date
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String dob = readerDTO.getDateOfBirth() != null ? sdf.format(readerDTO.getDateOfBirth()) : null;
+        String expiry = readerDTO.getCardExpiryDate() != null ? sdf.format(readerDTO.getCardExpiryDate()) : null;
+        
+        boolean success = readerService.insertReader(readerDTO.getNameReader(), readerDTO.getIdentityCard(), 
+                readerDTO.getPhone(), readerDTO.getEmail(), readerDTO.getAddress(),
+                dob, readerDTO.getCardType(), expiry);
         responseData.setSuccess(true);
         responseData.setData(success);
         return new ResponseEntity<>(responseData, HttpStatus.OK);
@@ -65,17 +68,16 @@ public class ReaderController {
 
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updateReader(@PathVariable int id,
-                                        @RequestParam(required = false) String nameReader,
-                                        @RequestParam(required = false) String phone,
-                                        @RequestParam(required = false) String email,
-                                        @RequestParam(required = false) String address,
-                                        @RequestParam(required = false) String dateOfBirth,
-                                        @RequestParam(required = false) CardType cardType,
-                                        @RequestParam(required = false) String cardExpiryDate,
-                                        @RequestParam(required = false) ReaderStatus status) {
+                                        @Valid @RequestBody ReaderDTO readerDTO) {
         ResponseData responseData = new ResponseData();
-        boolean success = readerService.updateReader(id, nameReader, phone, email, address,
-                dateOfBirth, cardType, cardExpiryDate, status);
+        
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String dob = readerDTO.getDateOfBirth() != null ? sdf.format(readerDTO.getDateOfBirth()) : null;
+        String expiry = readerDTO.getCardExpiryDate() != null ? sdf.format(readerDTO.getCardExpiryDate()) : null;
+
+        boolean success = readerService.updateReader(id, readerDTO.getNameReader(), readerDTO.getPhone(), 
+                readerDTO.getEmail(), readerDTO.getAddress(),
+                dob, readerDTO.getCardType(), expiry, readerDTO.getStatus());
         responseData.setSuccess(success);
         responseData.setData(success);
         return new ResponseEntity<>(responseData, HttpStatus.OK);

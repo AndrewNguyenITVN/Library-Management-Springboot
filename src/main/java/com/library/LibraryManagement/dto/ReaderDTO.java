@@ -3,17 +3,33 @@ package com.library.LibraryManagement.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.library.LibraryManagement.entity.Reader.CardType;
 import com.library.LibraryManagement.entity.Reader.ReaderStatus;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.Pattern;
 import java.util.Date;
 
 public class ReaderDTO {
     private int id;
+    
+    @NotBlank(message = "Reader name cannot be blank")
     private String nameReader;
+    
+    @NotBlank(message = "Identity card cannot be blank")
     private String identityCard;
+    
+    @NotBlank(message = "Phone number cannot be blank")
+    @Pattern(regexp = "^\\d{10}$", message = "Phone number must be 10 digits")
     private String phone;
+    
+    @Email(message = "Invalid email format")
     private String email;
+    
     private String address;
     
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @Past(message = "Date of birth must be in the past")
     private Date dateOfBirth;
     
     private CardType cardType;
