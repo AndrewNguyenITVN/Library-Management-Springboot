@@ -4,9 +4,11 @@ import com.library.LibraryManagement.dto.BorrowingDTO;
 import com.library.LibraryManagement.entity.Borrowing.DamageStatus;
 import com.library.LibraryManagement.payload.ResponseData;
 import com.library.LibraryManagement.service.BorrowBookService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -18,17 +20,16 @@ import java.util.Map;
 @RestController
 @CrossOrigin
 @RequestMapping("/borrowing")
+@Validated
 public class BorrowingController {
     @Autowired
     private BorrowBookService borrowBookService;
 
     @PostMapping("/borrow")
-    public ResponseEntity<?> borrowBook(@RequestParam String identityCard,
-                                      @RequestParam String bookSeri,
-                                      @RequestParam(required = false) String notes) {
+    public ResponseEntity<?> borrowBook(@Valid @RequestBody BorrowingDTO borrowingDTO) {
         ResponseData resp = new ResponseData();
         try {
-            Boolean isSuccess = borrowBookService.borrowBook(identityCard, bookSeri, notes);
+            Boolean isSuccess = borrowBookService.borrowBook(borrowingDTO.getIdentityCard(), borrowingDTO.getBookSeri(), borrowingDTO.getNotes());
             resp.setSuccess(true);
             resp.setData(isSuccess);
             resp.setDesc("Mượn sách thành công");
@@ -41,12 +42,10 @@ public class BorrowingController {
 
     @PutMapping("/return")
     public ResponseEntity<?> returnBook(@RequestParam int borrowingId,
-                                      @RequestParam(required = false) DamageStatus damageStatus,
-                                      @RequestParam(required = false) BigDecimal damageFine,
-                                      @RequestParam(required = false) String notes) {
+                                      @Valid @RequestBody BorrowingDTO borrowingDTO) {
         ResponseData resp = new ResponseData();
         try {
-            Boolean isSuccess = borrowBookService.returnBook(borrowingId, damageStatus, damageFine, notes);
+            Boolean isSuccess = borrowBookService.returnBook(borrowingId, borrowingDTO.getDamageStatus(), borrowingDTO.getDamageFine(), borrowingDTO.getNotes());
             resp.setSuccess(true);
             resp.setData(isSuccess);
             resp.setDesc("Trả sách thành công");

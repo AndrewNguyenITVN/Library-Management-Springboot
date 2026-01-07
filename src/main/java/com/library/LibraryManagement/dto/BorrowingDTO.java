@@ -2,13 +2,19 @@ package com.library.LibraryManagement.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.library.LibraryManagement.entity.Borrowing.DamageStatus;
+import jakarta.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 import java.util.Date;
 
 public class BorrowingDTO {
     private int id;
+    
+    @NotBlank(message = "Identity card cannot be blank")
     private String identityCard;
+    
+    @NotBlank(message = "Book serial number cannot be blank")
     private String bookSeri;
+    
     private String bookName;
     private String readerName;
     private String phone;
