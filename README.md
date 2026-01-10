@@ -1,63 +1,114 @@
-# Library Management System
+# 📚 Library Management System
 
 A Spring Boot-based library management system that provides a robust backend for managing library operations.
 
 ## Technologies Used
 
-- Java
-- Spring Boot
-- Spring Security
-- Spring Data JPA
-- MySQL Database
-- JWT Authentication
-- Maven
+- **Java** - Core programming language
+- **Spring Boot** - Application framework
+- **Spring Data JPA** - Database interactions using Hibernate
+- **Spring Security** - Authentication and Authorization
+- **JWT (JSON Web Token)** - Stateless authentication
+- **MySQL** - Relational database
+- **Maven** - Dependency management
+- **Bean Validation** - Input validation (Hibernate Validator)
 
-## Features
+## Key Features
 
-- User Authentication and Authorization
-- Book Management
-- Member Management
-- Borrowing System
-- Security with JWT
+### Authentication & Authorization
+- Secure login system using JWT
+- Role-based access control (Admin, Staff)
+- Password encryption with BCrypt
+- Stateless session management
 
-## Getting Started
+### Book Management
+- Create, Read, Update, Delete (CRUD) operations for books
+- Manage book categories, authors, and publishers
+- Handle book stock and availability
+- File upload support for book covers
+- Advanced search and filtering
 
-1. Clone the repository
-```bash
-git clone https://github.com/AndrewNguyenITVN/Library-Management-Springboot.git
-```
+### Reader Management
+- Manage reader profiles and library cards
+- Track reading history and borrowing status
+- Support for different card types (Student, Teacher, etc.)
 
-2. Configure MySQL database
-- Create a new database
-- Update application.properties with your database credentials
+### Borrowing System
+- Streamlined borrowing and returning process
+- Automatic due date calculation
+- Fine calculation for overdue books
+- Track book condition (Damage status)
 
-3. Build the project
-```bash
-mvn clean install
-```
+### Fine & Payment
+- Automated fine calculation based on overdue days
+- Manage fine payments and history
+- Support for different payment methods
 
-4. Run the application
-```bash
-mvn spring-boot:run
-```
+### Notification System
+- Email notifications for borrowing confirmations (and potentially overdue reminders)
 
 ## Project Structure
 
+The project follows a standard 3-layer architecture (Controller-Service-Repository) with clear separation of concerns:
+
 ```
-src/main/java
-├── com.librabry
-│   ├── config/         # Configuration classes
-│   ├── controller/     # REST controllers
-│   ├── model/         # Entity classes
-│   ├── repository/    # Data access layer
-│   ├── service/       # Business logic layer
-│   └── security/      # Security related classes
+src/main/java/com/library/LibraryManagement
+├── controller/     # REST API endpoints (Handling HTTP requests)
+├── dto/            # Data Transfer Objects (Request/Response models)
+├── entity/         # JPA Entities (Database tables mapping)
+├── mapper/         # Object mapping (Entity <-> DTO)
+├── payload/        # Standardized API response wrappers
+├── repository/     # Data Access Layer (Spring Data JPA interfaces)
+├── scheduler/      # Scheduled tasks (e.g., checking overdue books)
+├── security/       # JWT filters and security configuration
+├── service/        # Business logic interfaces
+│   └── impl/       # Business logic implementations
+└── utils/          # Utility classes (JwtUtils, etc.)
 ```
 
-## Security
+## Getting Started
 
-The application uses JWT (JSON Web Token) for authentication and authorization. Make sure to include the JWT token in the Authorization header for protected endpoints.
+### Prerequisites
+- JDK
+- Maven
+- MySQL
 
-## License
+### Installation
 
-This project is licensed under the MIT License.
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/AndrewNguyenITVN/Library-Management-Springboot.git
+   cd Library-Management-Springboot
+   ```
+
+2. **Configure Database**
+   - Create a MySQL database named `library_management`.
+   - Open `src/main/resources/application.yml` and update your database credentials:
+     ```yaml
+     spring:
+       datasource:
+         url: jdbc:mysql://localhost:3306/library_management
+         username: your_username
+         password: your_password
+     ```
+
+3. **Build the project**
+   ```bash
+   mvn clean install
+   ```
+
+4. **Run the application**
+   ```bash
+   mvn spring-boot:run
+   ```
+   The API will be available at `http://localhost:8080`.
+
+## Security Configuration
+
+The application uses a custom JWT filter to intercept requests.
+- **Public endpoints:** Login, Public search APIs
+- **Protected endpoints:** All management APIs require a valid Bearer Token in the `Authorization` header.
+
+## Contribution
+
+Contributions are welcome! Please fork the repository and submit a pull request.
