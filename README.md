@@ -1,4 +1,4 @@
-# 📚 Library Management System
+# Library Management System
 
 A Spring Boot-based library management system that provides a robust backend for managing library operations.
 
@@ -10,7 +10,6 @@ A Spring Boot-based library management system that provides a robust backend for
 - **Spring Security** - Authentication and Authorization
 - **JWT (JSON Web Token)** - Stateless authentication
 - **MySQL** - Relational database
-- **Maven** - Dependency management
 - **Bean Validation** - Input validation (Hibernate Validator)
 
 ## Key Features
@@ -70,7 +69,6 @@ src/main/java/com/library/LibraryManagement
 
 ### Prerequisites
 - JDK
-- Maven
 - MySQL
 
 ### Installation
@@ -109,6 +107,3 @@ The application uses a custom JWT filter to intercept requests.
 - **Public endpoints:** Login, Public search APIs
 - **Protected endpoints:** All management APIs require a valid Bearer Token in the `Authorization` header.
 
-## Contribution
-
-Contributions are welcome! Please fork the repository and submit a pull request.
