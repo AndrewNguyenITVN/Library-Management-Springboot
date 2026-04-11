@@ -48,7 +48,7 @@ public class CustomsFilterSecurity {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login/**", "/api/auth/**").permitAll()
+                .requestMatchers("/login/signin", "/login/refresh-token", "/login/logout", "/login/add-user", "/api/auth/**").permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/staff/**").hasRole("STAFF")
                 .anyRequest().authenticated()
