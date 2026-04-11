@@ -22,6 +22,9 @@ public class User {
     @Column(name = "role", nullable = false)
     private Role role;
 
+    @Column(name = "refresh_token", length = 512)
+    private String refreshToken;
+
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
@@ -75,6 +78,14 @@ public class User {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 
     public Date getCreatedAt() {
