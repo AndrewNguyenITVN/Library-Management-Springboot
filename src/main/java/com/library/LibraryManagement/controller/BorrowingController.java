@@ -19,29 +19,29 @@ import java.util.Map;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/borrowing")
+@RequestMapping("/api/borrowings")
 @Validated
 public class BorrowingController {
     @Autowired
     private BorrowBookService borrowBookService;
 
-    @PostMapping("/borrow")
+    @PostMapping
     public ResponseEntity<?> borrowBook(@Valid @RequestBody BorrowingDTO borrowingDTO) {
         ResponseData resp = new ResponseData();
         try {
             Boolean isSuccess = borrowBookService.borrowBook(borrowingDTO.getIdentityCard(), borrowingDTO.getBookSeri(), borrowingDTO.getNotes());
-            resp.setSuccess(true);
-            resp.setData(isSuccess);
-            resp.setDesc("Mượn sách thành công");
+        resp.setSuccess(true);
+        resp.setData(isSuccess);
+        resp.setDesc("Mượn sách thành công");
         } catch (Exception e) {
             resp.setSuccess(false);
             resp.setDesc("Mượn sách thất bại: " + e.getMessage());
         }
-        return new ResponseEntity<>(resp, HttpStatus.OK);
+        return new ResponseEntity<>(resp, HttpStatus.CREATED);
     }
 
-    @PutMapping("/return")
-    public ResponseEntity<?> returnBook(@RequestParam int borrowingId,
+    @PutMapping("/{borrowingId}/return")
+    public ResponseEntity<?> returnBook(@PathVariable int borrowingId,
                                       @Valid @RequestBody BorrowingDTO borrowingDTO) {
         ResponseData resp = new ResponseData();
         try {
@@ -56,7 +56,7 @@ public class BorrowingController {
         return new ResponseEntity<>(resp, HttpStatus.OK);
     }
 
-    @GetMapping("/all")
+    @GetMapping
     public ResponseEntity<?> getAll() {
         ResponseData resp = new ResponseData();
         List<BorrowingDTO> list = borrowBookService.getAllBorrowings();
@@ -66,7 +66,7 @@ public class BorrowingController {
         return new ResponseEntity<>(resp, HttpStatus.OK);
     }
 
-    @GetMapping("/by-reader")
+    @GetMapping("/search-by-reader")
     public ResponseEntity<?> getBorrowingsByIdentityCard(@RequestParam String identityCard) {
         ResponseData resp = new ResponseData();
         List<BorrowingDTO> list = borrowBookService.getBorrowingsByIdentityCard(identityCard);
@@ -130,8 +130,8 @@ public class BorrowingController {
         return new ResponseEntity<>(resp, HttpStatus.OK);
     }
 
-    @PostMapping("/pay-fine")
-    public ResponseEntity<?> payFine(@RequestParam int borrowingId,
+    @PostMapping("/{borrowingId}/fine-payments")
+    public ResponseEntity<?> payFine(@PathVariable int borrowingId,
                                    @RequestParam BigDecimal amount,
                                    @RequestParam(required = false) String notes) {
         ResponseData resp = new ResponseData();
