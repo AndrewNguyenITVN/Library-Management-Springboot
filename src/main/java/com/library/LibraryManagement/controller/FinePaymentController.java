@@ -13,12 +13,12 @@ import java.util.List;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/fine-payment")
+@RequestMapping("/api/fine-payments")
 public class FinePaymentController {
     @Autowired
     private FinePaymentService finePaymentService;
 
-    @GetMapping("/all")
+    @GetMapping
     public ResponseEntity<?> getAllPayments() {
         ResponseData responseData = new ResponseData();
         List<FinePaymentDTO> payments = finePaymentService.getAllPayments();
@@ -63,16 +63,16 @@ public class FinePaymentController {
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<?> createPayment(@RequestBody FinePaymentDTO paymentDTO) {
         ResponseData responseData = new ResponseData();
         boolean success = finePaymentService.createPayment(paymentDTO);
         responseData.setSuccess(success);
         responseData.setDesc(success ? "Tạo thanh toán thành công" : "Tạo thanh toán thất bại");
-        return new ResponseEntity<>(responseData, success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(responseData, success ? HttpStatus.CREATED : HttpStatus.BAD_REQUEST);
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<?> updatePayment(@PathVariable Integer id, @RequestBody FinePaymentDTO paymentDTO) {
         ResponseData responseData = new ResponseData();
         boolean success = finePaymentService.updatePayment(id, paymentDTO);
@@ -81,7 +81,7 @@ public class FinePaymentController {
         return new ResponseEntity<>(responseData, success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
     }
 
-    @PutMapping("/update-status/{id}")
+    @PatchMapping("/{id}/status")
     public ResponseEntity<?> updatePaymentStatus(
             @PathVariable Integer id,
             @RequestParam FinePayment.PaymentStatus status) {
@@ -92,7 +92,7 @@ public class FinePaymentController {
         return new ResponseEntity<>(responseData, success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> deletePayment(@PathVariable Integer id) {
         ResponseData responseData = new ResponseData();
         boolean success = finePaymentService.deletePayment(id);

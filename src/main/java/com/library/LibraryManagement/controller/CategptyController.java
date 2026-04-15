@@ -14,13 +14,13 @@ import java.util.List;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/category")
+@RequestMapping("/api/categories")
 @Validated
 public class CategptyController {
     @Autowired
     CategoryService categoryService;
 
-    @PostMapping("/insert-category")
+    @PostMapping
     public ResponseEntity<?> insertCategory(@Valid @RequestBody CategoryDTO categoryDTO) {
         ResponseData responseData = new ResponseData();
         boolean success = categoryService.createCategory(categoryDTO.getNameCate());
@@ -29,12 +29,12 @@ public class CategptyController {
                 ? "Thêm danh mục thành công"
                 : "Thêm danh mục thất bại");
         responseData.setData(success);
-        return new ResponseEntity<>(responseData, HttpStatus.OK);
+        return new ResponseEntity<>(responseData, success ? HttpStatus.CREATED : HttpStatus.BAD_REQUEST);
     }
 
-    @PutMapping("/update-category")
+    @PutMapping("/{id}")
     public ResponseEntity<?> updateCategory(
-            @RequestParam int id,
+            @PathVariable int id,
             @Valid @RequestBody CategoryDTO categoryDTO) {
         ResponseData responseData = new ResponseData();
         boolean success = categoryService.updateCategory(id, categoryDTO.getNameCate());
@@ -47,7 +47,7 @@ public class CategptyController {
                 success ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
 
-    @GetMapping("/get-all-categories")
+    @GetMapping
     public ResponseEntity<?> getAllCategories() {
         ResponseData responseData = new ResponseData();
         List<CategoryDTO> list = categoryService.getAllCategories();

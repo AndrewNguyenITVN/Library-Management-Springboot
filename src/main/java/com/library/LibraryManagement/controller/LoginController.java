@@ -20,7 +20,7 @@ import java.util.Map;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/login")
+@RequestMapping("/api/auth")
 public class LoginController {
 
     @Autowired
@@ -32,7 +32,7 @@ public class LoginController {
     @Autowired
     AuthenticationManager authenticationManager;
 
-    @PostMapping("/signin")
+    @PostMapping("/login")
     public ResponseEntity<?> signin(@Valid @RequestBody LoginRequest loginRequest) {
         ResponseData responseData = new ResponseData();
         try {
@@ -101,7 +101,7 @@ public class LoginController {
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
-    @PostMapping("/add-user")
+    @PostMapping("/register")
     public ResponseEntity<?> createUser(@RequestBody Map<String, String> request) {
         ResponseData responseData = new ResponseData();
         String username = request.get("username");

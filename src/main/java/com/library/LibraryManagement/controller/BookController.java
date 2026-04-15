@@ -16,7 +16,7 @@ import java.util.List;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/book")
+@RequestMapping("/api/books")
 @Validated
 public class BookController {
     @Autowired
@@ -25,7 +25,7 @@ public class BookController {
     @Autowired
     BookService bookService;
 
-    @GetMapping("/show-all-books")
+    @GetMapping
     public ResponseEntity<?> showListOfBooks() {
         ResponseData responseData = new ResponseData();
         responseData.setSuccess(true);
@@ -34,34 +34,33 @@ public class BookController {
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
-    @PostMapping("/add-book")
+    @PostMapping
     public ResponseEntity<?> addBooks(@RequestParam MultipartFile file,
                                     @Valid @ModelAttribute BookDTO bookDTO) {
         ResponseData responseData = new ResponseData();
-        // Since bookService.addBook still takes individual parameters, we need to extract them from DTO or update service
-        // For now, mapping from DTO to parameters to maintain service compatibility
         boolean isSuccess = bookService.addBook(file, bookDTO.getBookSeri(), bookDTO.getNameBook(), 
                 bookDTO.getCategoryId(), bookDTO.getStockQuantity(),
                 bookDTO.getAuthor(), bookDTO.getPublisher(), bookDTO.getPublishYear(), 
                 bookDTO.getIsbn(), bookDTO.getDescription(), bookDTO.getLanguage(), 
                 bookDTO.getEdition(), bookDTO.getPageCount());
         responseData.setData(isSuccess);
-        return new ResponseEntity<>(responseData, HttpStatus.OK);
+        responseData.setSuccess(isSuccess);
+        return new ResponseEntity<>(responseData, isSuccess ? HttpStatus.CREATED : HttpStatus.BAD_REQUEST);
     }
 
-    @PostMapping("/delete-book")
-    public ResponseEntity<?> deleteBookFromList(@RequestParam int id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteBookFromList(@PathVariable int id) {
         ResponseData responseData = new ResponseData();
         boolean isSuccess = bookService.delBook(id);
+        responseData.setSuccess(isSuccess);
         responseData.setData(isSuccess);
-        return new ResponseEntity<>(responseData, HttpStatus.OK);
+        return new ResponseEntity<>(responseData, isSuccess ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<?> updateBook(@PathVariable int id,
                                       @RequestParam("file") MultipartFile file,
                                       @Valid @ModelAttribute BookDTO bookDTO) {
-        // Similar mapping as add-book
         boolean isSuccess = bookService.editBook(id, file, bookDTO.getBookSeri(), bookDTO.getNameBook(), 
                 bookDTO.getStockQuantity(), bookDTO.getCategoryId(),
                 bookDTO.getAuthor(), bookDTO.getPublisher(), bookDTO.getPublishYear(), 
@@ -69,13 +68,9 @@ public class BookController {
                 bookDTO.getEdition(), bookDTO.getPageCount());
         
         ResponseData responseData = new ResponseData();
-        if (isSuccess) {
-            responseData.setData(isSuccess);
-            responseData.setSuccess(true);
-        } else {
-            responseData.setSuccess(false);
-        }
-        return new ResponseEntity<>(responseData, HttpStatus.OK);
+        responseData.setSuccess(isSuccess);
+        responseData.setData(isSuccess);
+        return new ResponseEntity<>(responseData, isSuccess ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
 
     @GetMapping("/search")
@@ -91,7 +86,7 @@ public class BookController {
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
-    @GetMapping("/search-seri")
+    @GetMapping("/search-by-seri")
     public ResponseEntity<?> searchBookByBookSeri(@RequestParam String bookSeri) {
         ResponseData responseData = new ResponseData();
         try {

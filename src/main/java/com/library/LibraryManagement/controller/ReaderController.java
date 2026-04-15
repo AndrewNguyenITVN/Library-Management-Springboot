@@ -17,13 +17,13 @@ import java.util.List;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/reader")
+@RequestMapping("/api/readers")
 @Validated
 public class ReaderController {
     @Autowired
     ReaderService readerService;
 
-    @PostMapping("/insert-reader")
+    @PostMapping
     public ResponseEntity<?> insertReader(@Valid @RequestBody ReaderDTO readerDTO) {
         ResponseData responseData = new ResponseData();
         // Convert Date objects to Strings for service compatibility if needed, or update service to accept DTO/Date
@@ -36,10 +36,10 @@ public class ReaderController {
                 dob, readerDTO.getCardType(), expiry);
         responseData.setSuccess(true);
         responseData.setData(success);
-        return new ResponseEntity<>(responseData, HttpStatus.OK);
+        return new ResponseEntity<>(responseData, HttpStatus.CREATED);
     }
 
-    @GetMapping("/get-all-users")
+    @GetMapping
     public ResponseEntity<?> getAllReaders() {
         ResponseData responseData = new ResponseData();
         responseData.setSuccess(true);
@@ -57,7 +57,7 @@ public class ReaderController {
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
-    @GetMapping("/search-by-idcard")
+    @GetMapping("/search-by-identity-card")
     public ResponseEntity<?> searchByIdentityCard(@RequestParam String identityCard) {
         ResponseData responseData = new ResponseData();
         responseData.setData(readerService.searchReaderByIdentityCard(identityCard));
@@ -66,7 +66,7 @@ public class ReaderController {
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<?> updateReader(@PathVariable int id,
                                         @Valid @RequestBody ReaderDTO readerDTO) {
         ResponseData responseData = new ResponseData();
