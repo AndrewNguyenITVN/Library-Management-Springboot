@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +24,7 @@ public class ReaderController {
     @Autowired
     ReaderService readerService;
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     @PostMapping
     public ResponseEntity<?> insertReader(@Valid @RequestBody ReaderDTO readerDTO) {
         ResponseData responseData = new ResponseData();
@@ -39,6 +41,7 @@ public class ReaderController {
         return new ResponseEntity<>(responseData, HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     @GetMapping
     public ResponseEntity<?> getAllReaders() {
         ResponseData responseData = new ResponseData();
@@ -48,6 +51,7 @@ public class ReaderController {
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     @GetMapping("/search")
     public ResponseEntity<?> searchReader(@RequestParam String nameReader) {
         ResponseData responseData = new ResponseData();
@@ -57,6 +61,7 @@ public class ReaderController {
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     @GetMapping("/search-by-identity-card")
     public ResponseEntity<?> searchByIdentityCard(@RequestParam String identityCard) {
         ResponseData responseData = new ResponseData();
@@ -66,6 +71,7 @@ public class ReaderController {
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     @PutMapping("/{id}")
     public ResponseEntity<?> updateReader(@PathVariable int id,
                                         @Valid @RequestBody ReaderDTO readerDTO) {

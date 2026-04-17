@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +21,7 @@ public class CategptyController {
     @Autowired
     CategoryService categoryService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<?> insertCategory(@Valid @RequestBody CategoryDTO categoryDTO) {
         ResponseData responseData = new ResponseData();
@@ -32,6 +34,7 @@ public class CategptyController {
         return new ResponseEntity<>(responseData, success ? HttpStatus.CREATED : HttpStatus.BAD_REQUEST);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<?> updateCategory(
             @PathVariable int id,
@@ -47,6 +50,7 @@ public class CategptyController {
                 success ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     @GetMapping
     public ResponseEntity<?> getAllCategories() {
         ResponseData responseData = new ResponseData();

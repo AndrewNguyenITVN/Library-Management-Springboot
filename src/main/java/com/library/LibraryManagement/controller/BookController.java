@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,6 +26,7 @@ public class BookController {
     @Autowired
     BookService bookService;
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     @GetMapping
     public ResponseEntity<?> showListOfBooks() {
         ResponseData responseData = new ResponseData();
@@ -34,6 +36,7 @@ public class BookController {
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<?> addBooks(@RequestParam MultipartFile file,
                                     @Valid @ModelAttribute BookDTO bookDTO) {
@@ -48,6 +51,7 @@ public class BookController {
         return new ResponseEntity<>(responseData, isSuccess ? HttpStatus.CREATED : HttpStatus.BAD_REQUEST);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteBookFromList(@PathVariable int id) {
         ResponseData responseData = new ResponseData();
@@ -57,6 +61,7 @@ public class BookController {
         return new ResponseEntity<>(responseData, isSuccess ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<?> updateBook(@PathVariable int id,
                                       @RequestParam("file") MultipartFile file,
@@ -73,6 +78,7 @@ public class BookController {
         return new ResponseEntity<>(responseData, isSuccess ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     @GetMapping("/search")
     public ResponseEntity<?> searchBooks(@RequestParam String bookName) {
         ResponseData responseData = new ResponseData();
@@ -86,6 +92,7 @@ public class BookController {
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     @GetMapping("/search-by-seri")
     public ResponseEntity<?> searchBookByBookSeri(@RequestParam String bookSeri) {
         ResponseData responseData = new ResponseData();
