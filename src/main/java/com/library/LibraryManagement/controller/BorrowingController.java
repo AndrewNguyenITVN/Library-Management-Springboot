@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -25,6 +26,7 @@ public class BorrowingController {
     @Autowired
     private BorrowBookService borrowBookService;
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     @PostMapping
     public ResponseEntity<?> borrowBook(@Valid @RequestBody BorrowingDTO borrowingDTO) {
         ResponseData resp = new ResponseData();
@@ -40,6 +42,7 @@ public class BorrowingController {
         return new ResponseEntity<>(resp, HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     @PutMapping("/{borrowingId}/return")
     public ResponseEntity<?> returnBook(@PathVariable int borrowingId,
                                       @Valid @RequestBody BorrowingDTO borrowingDTO) {
@@ -56,6 +59,7 @@ public class BorrowingController {
         return new ResponseEntity<>(resp, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     @GetMapping
     public ResponseEntity<?> getAll() {
         ResponseData resp = new ResponseData();
@@ -66,6 +70,7 @@ public class BorrowingController {
         return new ResponseEntity<>(resp, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     @GetMapping("/search-by-reader")
     public ResponseEntity<?> getBorrowingsByIdentityCard(@RequestParam String identityCard) {
         ResponseData resp = new ResponseData();
@@ -76,6 +81,7 @@ public class BorrowingController {
         return new ResponseEntity<>(resp, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     @GetMapping("/overdue")
     public ResponseEntity<?> getOverdueBorrowings() {
         ResponseData resp = new ResponseData();
@@ -86,6 +92,7 @@ public class BorrowingController {
         return new ResponseEntity<>(resp, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/stats")
     public ResponseEntity<ResponseData> getBorrowingStats(
             @RequestParam String type,
@@ -130,6 +137,7 @@ public class BorrowingController {
         return new ResponseEntity<>(resp, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     @PostMapping("/{borrowingId}/fine-payments")
     public ResponseEntity<?> payFine(@PathVariable int borrowingId,
                                    @RequestParam BigDecimal amount,
